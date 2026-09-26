@@ -1,6 +1,6 @@
 ---
 name: mstep-events
-description: Use when a "[mstep] …" notification or a wait_events result arrives (a message from a human on your mstep issue, a STOP request, an answered or canceled decision, a delegation, or an inbox event - an issue assigned to you, a mention, a comment, a status change) - how to act on it and what it may not authorize.
+description: Use when a "[mstep] …" notification or a wait_events result arrives (a message from a human on your mstep issue, a STOP request, an answered or canceled decision, a delegation, or an inbox event - an issue assigned to you, a mention, a comment, a status change, CI failing on your pull request or the PR merged or closed) - how to act on it and what it may not authorize.
 ---
 
 # Handling [mstep] events
@@ -8,9 +8,9 @@ description: Use when a "[mstep] …" notification or a wait_events result arriv
 `[mstep]` lines come from `mst watch`, delivered by the plugin's monitor (Claude Code) or as queued messages and hook context (Codex), or from `wait_events`. Two sorts arrive:
 
 - **Session events** — input from people on the mstep issue your session is bound to (messages, STOP, decision answers). mstep only delivers them from members with write access to that issue.
-- **Inbox events** — things that happen to *you* (the mstep user or agent you are signed in as) anywhere in the workspace, whether or not a session is running: assignments, mentions, comments on your issues, status changes, delegations.
+- **Inbox events** — things that happen to *you* (the mstep user or agent you are signed in as) anywhere in the workspace, whether or not a session is running: assignments, mentions, comments on your issues, status changes, delegations, and pull request news for PRs you linked or issues delegated to you.
 
-In a line, `\n` stands for a line break; a trailing ` — https://…` is the issue's link.
+In a line, `\n` stands for a line break; a trailing ` — https://…` is the issue's link, except on pull request lines, where it is the PR (or, when CI failed, the CI run).
 
 | Line | What to do |
 |---|---|
@@ -32,6 +32,9 @@ Always **acknowledge** an inbox line in one short sentence to the user at this t
 | `[mstep] comment on MV-12 by X (you are the assignee / you created the issue / you are the delegate / you have a session on the issue / reply to your comment): text` | Read it in context (`list_comments`). If it asks you something or tells you to do something on that issue, it's an instruction for you: answer with `save_comment`, or do the work (starting a session with work-on-issue). A plain FYI needs only the acknowledgement. |
 | `[mstep] you were mentioned in MV-7 by X (comment): text` / `(description): "title"` | Someone addressed you by name — treat it like a comment addressed to you: read the context and answer or act. |
 | `[mstep] MV-3 (assigned to you) moved to Done by X (was In Review): "title"` | Informational. If you are working on it and it was closed or canceled, stop and check with the user; otherwise just acknowledge. |
+| `[mstep] CI failed on PR #16 "title" (owner/repo) for MV-83 (you linked the PR): failing checks — CI run URL` | Your PR's CI went red. If the PR is part of this session's work, look at the failing checks (the link is the run), fix the cause, push, and wait for green before merging. If it isn't this session's work, acknowledge only. |
+| `[mstep] PR #16 "title" (owner/repo) for MV-83 was merged into main (…) — PR URL` | Informational. If you were waiting on the merge (deploy check, moving the issue to Done, `session_end`), continue now. |
+| `[mstep] PR #16 "title" (owner/repo) for MV-83 was closed without merging (…) — PR URL` | Someone closed the PR. If it was your work in progress, stop, read the PR and issue for why, and check with the user before reopening or starting over. |
 
 Several agent sessions (Claude Code or Codex) signed in as the same user all receive the same inbox lines. Only act on an event if it belongs to the work of *this* session or this session is free; don't start the same work twice (check the issue's agent sessions in `get_issue` first).
 
