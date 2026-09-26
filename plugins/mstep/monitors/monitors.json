@@ -1,0 +1,7 @@
+[
+  {
+    "name": "mstep-events",
+    "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/mst-run\" watch --state-dir \"${CLAUDE_PLUGIN_DATA}\"",
+    "description": "mstep: messages, stop requests and decision answers from humans on your issue"
+  }
+]

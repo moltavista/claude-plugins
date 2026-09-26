@@ -1,0 +1,34 @@
+#!/bin/sh
+# Runs the mst CLI for the mstep plugin's hooks and monitor.
+#
+# mst is optional: without it the plugin still gives Claude the mstep MCP
+# tools and skills. Then hooks are silent no-ops, the monitor idles quietly
+# (an exiting monitor would interrupt Claude), and SessionStart tells Claude
+# once how to get live updates.
+#
+# Lookup: $MST_BIN, `mst` on PATH, ~/.local/bin/mst (install.sh's default).
+
+for m in "${MST_BIN:-}" "$(command -v mst 2>/dev/null || true)" "$HOME/.local/bin/mst"; do
+  if [ -n "$m" ] && [ -x "$m" ]; then
+    exec "$m" "$@"
+  fi
+done
+
+case "$1 ${2:-}" in
+  "hook session-start")
+    cat >/dev/null
+    marker="${CLAUDE_PLUGIN_DATA:-${TMPDIR:-/tmp}}/.mst-missing-hint"
+    if [ ! -e "$marker" ]; then
+      mkdir -p "$(dirname "$marker")" 2>/dev/null && : >"$marker" 2>/dev/null
+      echo "The mstep plugin's helper CLI (mst) is not installed, so tool activity is not reported to mstep issues automatically and human comments do not arrive live; the mstep MCP tools work (use wait_events to wait for humans). To enable live updates the user can run: curl -fsSL https://mstep.moltavista.com/install.sh | sh && mst login"
+    fi
+    ;;
+  "watch "*)
+    # Stay alive silently until Claude Code ends the session.
+    while :; do sleep 3600; done
+    ;;
+  *)
+    cat >/dev/null 2>&1 || true
+    ;;
+esac
+exit 0

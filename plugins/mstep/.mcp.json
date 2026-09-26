@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mstep": {
+      "type": "http",
+      "url": "https://mstep.moltavista.com/mcp"
+    }
+  }
+}

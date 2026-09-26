@@ -1,0 +1,17 @@
+{
+  "name": "moltavista",
+  "description": "Claude Code plugins by Møltavista",
+  "owner": {
+    "name": "Møltavista",
+    "url": "https://git.teixos.net/moltavista"
+  },
+  "plugins": [
+    {
+      "name": "mstep",
+      "source": "./plugins/mstep",
+      "description": "Work mstep issues from Claude Code: MCP tools, live agent sessions on the issue, human decisions and steering",
+      "category": "productivity",
+      "tags": ["issues", "project-management", "mstep", "human-in-the-loop"]
+    }
+  ]
+}
