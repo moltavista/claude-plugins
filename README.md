@@ -4,6 +4,8 @@ A [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-market
 
 ```
 /plugin marketplace add https://git.teixos.net/moltavista/claude-plugins
+# while the moltavista org is private, org members use SSH instead:
+# /plugin marketplace add git@git.teixos.net:moltavista/claude-plugins.git
 /plugin install mstep@moltavista
 ```
 
