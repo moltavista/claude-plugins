@@ -2,6 +2,8 @@
 
 A [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces), also readable by OpenAI's Codex CLI.
 
+The mstep plugin needs the `mst` CLI (its MCP server runs through `mst mcp`): `curl -fsSL https://mstep.moltavista.com/install.sh | sh && mst login`, then `mst claude install`, or in Claude Code:
+
 ```
 /plugin marketplace add https://git.teixos.net/moltavista/claude-plugins
 # while the moltavista org is private, org members use SSH instead:
@@ -20,6 +22,6 @@ codex plugin marketplace add https://git.teixos.net/moltavista/claude-plugins.gi
 codex plugin add mstep@moltavista
 ```
 
-(or `mst codex install`, see [plugins/mstep](plugins/mstep#codex-cli)).
+(or `mst codex install`, see [plugins/mstep](plugins/mstep#codex-cli)). Several Claude Code / Codex sessions acting as different agents on one machine: [plugins/mstep](plugins/mstep#several-agents-on-one-machine).
 
-Check changes with `claude plugin validate .` and `claude plugin validate plugins/mstep` before pushing, and in Codex with a scratch `CODEX_HOME`: `codex plugin marketplace add <checkout>`, `codex plugin add mstep@moltavista`, `codex mcp list`. Bump the plugin's `version` in both `plugins/mstep/.claude-plugin/plugin.json` and `plugins/mstep/.codex-plugin/plugin.json` so installed copies update. mst embeds the skills and `hooks/codex-hooks.json` for `mst codex install --direct`: after changing them, copy them to mstep's `internal/mst/codexassets` (`just codex-plugin-check` there compares).
+Check changes with `claude plugin validate .` and `claude plugin validate plugins/mstep` before pushing, and in Codex with a scratch `CODEX_HOME`: `codex plugin marketplace add <checkout>`, `codex plugin add mstep@moltavista`, `codex mcp list`. Bump the plugin's `version` in both `plugins/mstep/.claude-plugin/plugin.json` and `plugins/mstep/.codex-plugin/plugin.json` so installed copies update. mst embeds the skills, `hooks/codex-hooks.json` and `codex.mcp.json` (`mst codex install --direct`, and the list of variables `mst mcp` needs): after changing them, copy them to mstep's `internal/mst/codexassets` (`just codex-plugin-check` there compares).

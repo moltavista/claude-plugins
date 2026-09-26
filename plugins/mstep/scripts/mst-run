@@ -1,30 +1,60 @@
 #!/bin/sh
-# Runs the mst CLI for the mstep plugin's hooks and monitor, in Claude Code
-# (hooks.json, monitors.json) and in Codex (codex-hooks.json). Arguments are
-# passed through unchanged: Codex runs hooks as one command string
+# Runs the mst CLI for the mstep plugin: the MCP server (`mst mcp`, from
+# .mcp.json), the hooks and the monitor, in Claude Code (hooks.json,
+# monitors.json) and in Codex (codex-hooks.json). Arguments are passed
+# through unchanged: Codex runs hooks as one command string
 # ("$PLUGIN_ROOT/scripts/mst-run" hook stop --agent codex), Claude Code with
 # an args list.
 #
-# mst is optional: without it the plugin still gives the agent the mstep MCP
-# tools and skills. Then hooks are silent no-ops (no output, exit 0), the
-# monitor idles quietly (an exiting monitor would interrupt Claude), and
-# SessionStart tells the agent once how to get live updates.
+# The MCP server needs mst: `mst mcp` bridges to https://mstep.moltavista.com/mcp
+# as the identity mst resolves for the session (MST_TOKEN, MST_PROFILE, a .mst
+# file, your `mst login`). Without mst (or with an mst older than the
+# bridge), `mst-run mcp` answers every MCP request with an error that
+# explains the one-line install, so the client shows why the server fails.
+# Hooks are then silent no-ops (no output, exit 0) and the monitor idles
+# quietly (an exiting monitor would interrupt Claude).
 #
 # Lookup: $MST_BIN, `mst` on PATH, ~/.local/bin/mst (install.sh's default).
 
+INSTALL='curl -fsSL https://mstep.moltavista.com/install.sh | sh && mst login'
+
+# mcp_error answers each JSON-RPC request on stdin with an error ($1).
+mcp_error() {
+  echo "$1" >&2
+  while IFS= read -r l; do
+    id=$(printf %s "$l" | sed -nE 's/^[{] *"jsonrpc" *: *"2.0" *, *"id" *: *([0-9]+|"[^"]*").*/\1/p; s/.*"method" *: *"initialize".*"id" *: *([0-9]+|"[^"]*").*/\1/p' | head -n 1)
+    if [ -n "$id" ]; then
+      printf '{"jsonrpc":"2.0","id":%s,"error":{"code":-32000,"message":"%s"}}\n' "$id" "$1"
+    fi
+  done
+  exit 0
+}
+
+old=""
 for m in "${MST_BIN:-}" "$(command -v mst 2>/dev/null || true)" "$HOME/.local/bin/mst"; do
   if [ -n "$m" ] && [ -x "$m" ]; then
+    if [ "${1:-}" = "mcp" ] && ! "$m" mcp --help >/dev/null 2>&1; then
+      # An mst from before the MCP bridge: keep looking, then explain.
+      old="$m"
+      continue
+    fi
     exec "$m" "$@"
   fi
 done
 
 case "$1 ${2:-}" in
+  "mcp "*)
+    if [ -n "$old" ]; then
+      mcp_error "mstep: the mstep MCP server runs through the mst CLI, and $old is too old for it (mst mcp). Update it: $INSTALL (then reconnect: /mcp in Claude Code, or restart Codex)"
+    fi
+    mcp_error "mstep: the mstep MCP server runs through the mst CLI, which is not installed. Install it: $INSTALL (then reconnect: /mcp in Claude Code, or restart Codex)"
+    ;;
   "hook session-start")
     cat >/dev/null
     marker="${CLAUDE_PLUGIN_DATA:-${TMPDIR:-/tmp}}/.mst-missing-hint"
     if [ ! -e "$marker" ]; then
       mkdir -p "$(dirname "$marker")" 2>/dev/null && : >"$marker" 2>/dev/null
-      echo "The mstep plugin's helper CLI (mst) is not installed, so tool activity is not reported to mstep issues automatically and human comments do not arrive live; the mstep MCP tools work (use wait_events to wait for humans). To enable live updates the user can run: curl -fsSL https://mstep.moltavista.com/install.sh | sh && mst login"
+      echo "The mstep plugin's helper CLI (mst) is not installed, so the mstep MCP tools, tool-activity reporting and live human comments are unavailable. The user can install it with: $INSTALL"
     fi
     ;;
   "watch "*)

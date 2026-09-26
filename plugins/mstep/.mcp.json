@@ -1,8 +1,9 @@
 {
   "mcpServers": {
     "mstep": {
-      "type": "http",
-      "url": "https://mstep.moltavista.com/mcp"
+      "type": "stdio",
+      "command": "${CLAUDE_PLUGIN_ROOT}/scripts/mst-run",
+      "args": ["mcp"]
     }
   }
 }
