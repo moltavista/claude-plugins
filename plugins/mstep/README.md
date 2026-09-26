@@ -5,6 +5,7 @@
 - **MCP tools** (`https://mstep.moltavista.com/mcp`): list, create and update issues and comments, edit descriptions, run an **agent session** on an issue, ask humans **decisions**, wait for their input.
 - **Live session on the issue**: with the `mst` CLI installed, hooks report what Claude does (tool actions, the task list as the plan, commits, pushes, pull requests, final replies, errors) to the issue it works on.
 - **Steering**: a monitor delivers comments, "Stop" and decision answers from humans on the issue into the running Claude Code session as `[mstep] …` notifications, within a second or two.
+- **Inbox**: the same monitor delivers what happens to *you* in mstep: issues assigned to you, @mentions, comments on issues you are assigned to, created or worked on, status changes of your issues, delegations (`[mstep] MV-20 assigned to you by …`). Turn it off with `MST_WATCH_INBOX=0` or pick kinds with `MST_WATCH_INBOX_KINDS=assigned,mentioned` (set in the environment Claude Code starts with).
 - **Skills**: `work-on-issue`, `ask-human`, `mstep-events`.
 
 ## Install
@@ -36,7 +37,7 @@ Without `mst` the plugin still works (MCP tools and skills); hooks and the monit
 1. At session start, the plugin's `SessionStart` hook (`mst hook session-start`) tells Claude its **mstep client session id** and records which Claude Code session this Claude process runs.
 2. When Claude starts on an issue it calls `session_start` with that id. The issue now shows a live agent session bound to this Claude Code session.
 3. Hooks (`mst hook …`, run in the background) forward tool actions, the task list, commits/pushes/PR links, permission waits, final replies and errors to that session. When the Claude Code session exits, its mstep sessions are ended.
-4. The monitor (`mst watch`) streams mstep's agent events for the sessions bound to this Claude Code session and prints one `[mstep] …` line per human message, stop request or decision answer. Claude reacts even when idle.
+4. The monitor (`mst watch`) streams mstep's agent events for the sessions bound to this Claude Code session and prints one `[mstep] …` line per human message, stop request or decision answer, and per inbox event of the signed-in user. Claude reacts even when idle.
 
 Everything `mst` does is best effort: hooks never block Claude for more than ~2 s, always succeed, and log to `~/.config/mst/hook.log` (`watch.log` for the monitor).
 

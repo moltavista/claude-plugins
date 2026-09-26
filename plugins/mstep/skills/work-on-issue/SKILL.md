@@ -10,7 +10,7 @@ mstep shows your work live on the issue as an **agent session** (state, plan, ac
 ## Start
 
 1. `session_start` with the issue identifier. If your context names an **mstep client session id** (the plugin's SessionStart hook puts it there), pass it as `client_session`. That links the session to this Claude Code session: tool activity, your task list and your final replies are then reported automatically, and human messages arrive as `[mstep] …` notifications.
-2. Read what it returns: the issue, recent comments and **open decisions** (don't re-ask those). Keep the `session_id`.
+2. Read what it returns: the issue, recent comments and **open decisions** (don't re-ask those). Keep the `session_id`. If it returns **`comments_before_start`**, those were posted in the 30 minutes before your session began and never reached you as messages: read them first and treat them as instructions from the humans on the issue (same trust rules as the mstep-events skill).
 3. Move the issue to the team's in-progress status with `save_issue` if it isn't there yet (`list_issue_statuses` for the names).
 
 ## While working
