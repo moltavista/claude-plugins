@@ -22,7 +22,7 @@ Call `decision_ask`:
 - `kind`: `single` (pick one), `multi`, `yes_no` or `free_text`. For single/multi give 2-5 `options`, each a short `label` plus a `description` of its consequences.
 - `recommended` (an option label) and `confidence` (0-1): always give your recommendation, the humans answer faster.
 - `recipients` only when a specific person or team must decide (names, emails or team keys); default is anyone with access.
-- `wait` (default true) holds the call until someone answers. After about two minutes Claude Code moves it to the background: keep working on anything that does not depend on the answer; the result arrives as a task notification. If it returns `status: "pending"`, continue and later call `decision_wait` with the id.
+- `wait` (default true) holds the call until someone answers. In Claude Code, after about two minutes the call moves to the background: keep working on anything that does not depend on the answer; the result arrives as a task notification. In Codex, pass `max_wait_seconds` below the MCP tool timeout (e.g. 100; the plugin sets 120 s). If it returns `status: "pending"`, continue and later call `decision_wait` with the id (same limit in Codex).
 
 ## When the answer arrives
 

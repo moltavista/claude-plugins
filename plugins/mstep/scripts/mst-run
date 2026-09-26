@@ -1,10 +1,14 @@
 #!/bin/sh
-# Runs the mst CLI for the mstep plugin's hooks and monitor.
+# Runs the mst CLI for the mstep plugin's hooks and monitor, in Claude Code
+# (hooks.json, monitors.json) and in Codex (codex-hooks.json). Arguments are
+# passed through unchanged: Codex runs hooks as one command string
+# ("$PLUGIN_ROOT/scripts/mst-run" hook stop --agent codex), Claude Code with
+# an args list.
 #
-# mst is optional: without it the plugin still gives Claude the mstep MCP
-# tools and skills. Then hooks are silent no-ops, the monitor idles quietly
-# (an exiting monitor would interrupt Claude), and SessionStart tells Claude
-# once how to get live updates.
+# mst is optional: without it the plugin still gives the agent the mstep MCP
+# tools and skills. Then hooks are silent no-ops (no output, exit 0), the
+# monitor idles quietly (an exiting monitor would interrupt Claude), and
+# SessionStart tells the agent once how to get live updates.
 #
 # Lookup: $MST_BIN, `mst` on PATH, ~/.local/bin/mst (install.sh's default).
 
