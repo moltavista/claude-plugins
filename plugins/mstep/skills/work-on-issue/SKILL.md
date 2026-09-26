@@ -22,7 +22,7 @@ mstep shows your work live on the issue as an **agent session** (state, plan, ac
 
 - **Plan**: keep a task list (Claude Code: TaskCreate/TaskUpdate or TodoWrite; Codex: `update_plan`). With a linked client session it becomes the session plan automatically; without one, send the full list with `session_plan` whenever it changes.
 - **Activity**: linked sessions report tool calls by themselves. Add `session_activity` `thought` only for reasoning a human reviewer would want (a trade-off you took, a surprising finding). Without a linked session, also report notable `action`s (tests run, files changed).
-- **Git**: branch `mst-12-short-slug`; mention the identifier in commit messages (`MST-12: fix redirect`). Linked sessions pick up commits, pushes and PR URLs; otherwise add them with `session_link` (`branch`, `commit`, `pull_request`).
+- **Git**: branch `mst-12-short-slug`; mention the identifier in commit messages (`MST-12: fix redirect`). Linked sessions pick up commits, pushes, and the PR that a push reports or that `gh`/`tea`/`fj`/`glab` `pr create` opens. Add anything else with `session_link` (`branch`, `commit`, `pr`), in particular a PR opened through an API or the web UI. Link only your own PR: a linked PR can move the issue (merged → Done).
 - **Blocked on a human choice?** Use the ask-human skill (`decision_ask`); don't guess on product, scope or risky calls.
 - **Human input** (`[mstep]` lines, `wait_events` results): follow the mstep-events skill.
 - **Description edits**: `update_description` with `{find, replace}` edits, so concurrent human edits survive.
