@@ -1,7 +1,7 @@
 {
   "name": "mstep",
   "displayName": "mstep",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "mstep issue tracker for Claude Code: MCP tools, live agent sessions on the issue (activity, plan, commits), decisions for humans, and human comments/stop delivered into the running session",
   "author": {
     "name": "Møltavista",
