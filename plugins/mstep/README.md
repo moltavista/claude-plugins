@@ -35,7 +35,7 @@ Without `mst` the plugin still works (MCP tools and skills); hooks and the monit
 ## How it fits together
 
 1. At session start, the plugin's `SessionStart` hook (`mst hook session-start`) tells Claude its **mstep client session id** and records which Claude Code session this Claude process runs.
-2. When Claude starts on an issue it calls `session_start` with that id. The issue now shows a live agent session bound to this Claude Code session.
+2. When Claude starts on an issue it calls `session_start` with that id. The issue now shows a live agent session bound to this Claude Code session, and is assigned to you if nobody had it (an issue assigned to someone else is never taken over: Claude asks first).
 3. Hooks (`mst hook …`, run in the background) forward tool actions, the task list, commits/pushes/PR links, permission waits, final replies and errors to that session. When the Claude Code session exits, its mstep sessions are ended.
 4. The monitor (`mst watch`) streams mstep's agent events for the sessions bound to this Claude Code session and prints one `[mstep] …` line per human message, stop request or decision answer, and per inbox event of the signed-in user. Claude reacts even when idle.
 
