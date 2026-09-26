@@ -1,6 +1,6 @@
 {
   "name": "mstep",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "mstep issue tracker for Codex: MCP tools, live agent sessions on the issue (activity, plan, commits), decisions for humans, and human comments/stop delivered into the running session",
   "keywords": ["mstep", "issues", "agents", "human-in-the-loop"],
   "skills": "./skills/",
