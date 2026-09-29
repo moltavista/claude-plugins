@@ -2,7 +2,7 @@
 
 A [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces), also readable by OpenAI's Codex CLI.
 
-The mstep plugin needs the `mst` CLI (its MCP server runs through `mst mcp`): `curl -fsSL https://mstep.moltavista.com/install.sh | sh && mst login`, then `mst claude install`, or in Claude Code:
+The mstep plugin needs the `mst` CLI (its MCP server runs through `mst mcp`): `curl -fsSL https://mstep.moltavista.com/install.sh | sh && mst login`, then `mst claude install`, or in Claude Code. Verified standalone binaries are also available from the [public mst releases](https://github.com/moltavista/mst/releases/latest).
 
 ```
 /plugin marketplace add https://github.com/moltavista/claude-plugins
