@@ -22,10 +22,18 @@ jobs:
 
       - name: Fast-forward to the public Forgejo source
         shell: bash
+        env:
+          FORGEJO_READ_KEY: ${{ secrets.FORGEJO_READ_KEY }}
         run: |
           set -euo pipefail
-          git remote add forgejo https://git.teixos.net/moltavista/claude-plugins.git
-          git fetch forgejo main --tags
+          test -n "$FORGEJO_READ_KEY"
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$FORGEJO_READ_KEY" > "$HOME/.ssh/forgejo_read_key"
+          chmod 600 "$HOME/.ssh/forgejo_read_key"
+          cp .github/forgejo_known_hosts "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+          git remote add forgejo ssh://git@git.teixos.net/moltavista/claude-plugins.git
+          GIT_SSH_COMMAND="ssh -i $HOME/.ssh/forgejo_read_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" git fetch forgejo main --tags
           current="$(git rev-parse HEAD)"
           source="$(git rev-parse FETCH_HEAD)"
           if [ "$current" != "$source" ]; then
