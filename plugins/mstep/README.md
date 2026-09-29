@@ -23,9 +23,7 @@ mst login
 Then install the plugin, either with `mst claude install` or in Claude Code:
 
 ```
-/plugin marketplace add https://git.teixos.net/moltavista/claude-plugins
-# while the moltavista org is private, org members use SSH instead:
-# /plugin marketplace add git@git.teixos.net:moltavista/claude-plugins.git
+/plugin marketplace add https://github.com/moltavista/claude-plugins
 /plugin install mstep@moltavista
 ```
 
@@ -95,8 +93,7 @@ codex                      # review and trust the mstep hooks in /hooks
 Or by hand:
 
 ```sh
-codex plugin marketplace add https://git.teixos.net/moltavista/claude-plugins.git
-# while the moltavista org is private: git@git.teixos.net:moltavista/claude-plugins.git
+codex plugin marketplace add https://github.com/moltavista/claude-plugins.git
 codex plugin add mstep@moltavista
 mst login
 ```
