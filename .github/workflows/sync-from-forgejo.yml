@@ -1,0 +1,38 @@
+name: Sync marketplace from Forgejo
+
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: marketplace-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fast-forward to the public Forgejo source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git remote add forgejo https://git.teixos.net/moltavista/claude-plugins.git
+          git fetch forgejo main --tags
+          current="$(git rev-parse HEAD)"
+          source="$(git rev-parse FETCH_HEAD)"
+          if [ "$current" != "$source" ]; then
+            git merge-base --is-ancestor "$current" "$source" || {
+              echo "GitHub main diverged from Forgejo main; refusing to force-push" >&2
+              exit 1
+            }
+            git push origin "$source:refs/heads/main"
+          fi
+          git push origin --tags
