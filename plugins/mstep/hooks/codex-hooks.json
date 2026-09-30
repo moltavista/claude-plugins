@@ -19,6 +19,22 @@
             "type": "command",
             "command": "\"${PLUGIN_ROOT}/scripts/mst-run\" hook user-prompt-submit --agent codex --deliver",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/scripts/mst-run\" hook user-prompt-submit --agent codex",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/scripts/mst-run\" hook pre-tool-use --agent codex",
+            "async": true
           }
         ]
       }
@@ -67,6 +83,28 @@
           {
             "type": "command",
             "command": "\"${PLUGIN_ROOT}/scripts/mst-run\" hook subagent-stop --agent codex",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/scripts/mst-run\" hook pre-compact --agent codex",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/scripts/mst-run\" hook post-compact --agent codex",
             "async": true
           }
         ]
