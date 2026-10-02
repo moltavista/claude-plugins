@@ -49,10 +49,20 @@ If the plugin updates before mst does, the mstep MCP server fails to start and `
 1. At session start, the plugin's `SessionStart` hook (`mst hook session-start`) tells Claude its **mstep client session id** and **whom it acts as** ("You act in mstep as the mstep agent agentEngineer: profile agentEngineer from …/.mst"). It also records which Claude Code session this Claude process runs.
 2. The MCP server (`mst mcp`) forwards Claude's MCP calls to `https://mstep.moltavista.com/mcp` with the bearer credential of the same identity. It refreshes OAuth tokens and handles long waits (`wait_events`), cancellation and reconnects.
 3. When Claude starts on an issue, it calls `session_start` with that id. The issue now shows a live agent session bound to this Claude Code session. The issue is assigned to Claude's identity if nobody had it; an issue assigned to someone else is never taken over, and Claude asks first.
-4. Hooks (`mst hook …`, run in the background) forward tool actions ("Running …" while a command runs), the task list, commits/pushes/PR links, permission waits, prompts typed at the terminal, compactions, loaded instruction files, final replies and errors to that session. When the Claude Code session exits, its mstep sessions are ended. The events added in 0.6.0 need an mst with MV-232; older versions ignore them.
+4. Hooks (`mst hook …`, run in the background) forward tool actions ("Running …" while a command runs), the task list, commits/pushes/PR links, permission waits, prompts typed at the terminal, compactions, loaded instruction files, final replies and errors to that session. When the Claude Code session exits, its mstep sessions are ended. The events added in 0.6.0 need an mst with MV-232; older versions ignore them. 0.7.0 adds `PermissionDenied` and the approval hook (below).
 5. The monitor (`mst watch`) streams mstep's agent events for the sessions bound to this Claude Code session. It prints one `[mstep] …` line per human message, stop request or decision answer, and per inbox event of the identity. Claude reacts even when idle.
 
-Everything `mst` does in hooks is best effort: hooks never block Claude for more than about 2 s, always succeed, and log to `~/.config/mst/hook.log`. The monitor logs to `watch.log` and the MCP bridge to `mcp.log`.
+Everything `mst` does in hooks is best effort: hooks never block Claude for more than about 2 s, always succeed, and log to `~/.config/mst/hook.log`. The one exception is the opt-in approval hook below.
+
+## Remote approvals (0.7.0, MV-234)
+
+`mst approvals on` (per identity, on this machine; off by default) sends each permission prompt of a session bound to an mstep issue to mstep too.
+- **Who answers:** the agent's owner (who signed it in here) or a workspace admin can **allow it once** or **deny it** in the web app, after confirming with a second factor.
+- **When nobody answers:** if nobody answers within the wait (default 120 s, `--wait`), or anything fails, the prompt is answered at the terminal as usual. Nothing else ever allows a call.
+- **Claude Code** shows its prompt at once; whichever answer comes first wins.
+- **Codex** holds its prompt until mstep answers or the wait ends.
+
+It runs as the synchronous `PermissionRequest` hook `mst hook permission-request --approve`; `PermissionDenied` tells mstep the terminal answered. It needs a profile with an `mst_` token and an mst with MV-234. An older mst refuses the flag, and the prompt is answered at the terminal. The monitor logs to `watch.log` and the MCP bridge to `mcp.log`.
 
 ## Several agents on one machine
 
