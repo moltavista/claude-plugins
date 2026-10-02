@@ -52,17 +52,17 @@ If the plugin updates before mst does, the mstep MCP server fails to start and `
 4. Hooks (`mst hook …`, run in the background) forward tool actions ("Running …" while a command runs), the task list, commits/pushes/PR links, permission waits, prompts typed at the terminal, compactions, loaded instruction files, final replies and errors to that session. When the Claude Code session exits, its mstep sessions are ended. The events added in 0.6.0 need an mst with MV-232; older versions ignore them. 0.7.0 adds `PermissionDenied` and the approval hook (below).
 5. The monitor (`mst watch`) streams mstep's agent events for the sessions bound to this Claude Code session. It prints one `[mstep] …` line per human message, stop request or decision answer, and per inbox event of the identity. Claude reacts even when idle.
 
-Everything `mst` does in hooks is best effort: hooks never block Claude for more than about 2 s, always succeed, and log to `~/.config/mst/hook.log`. The one exception is the opt-in approval hook below.
+Everything `mst` does in hooks is best effort: hooks never block Claude for more than about 2 s, always succeed, and log to `~/.config/mst/hook.log`. The one exception is the opt-in approval hook below. The monitor logs to `watch.log` and the MCP bridge to `mcp.log`.
 
 ## Remote approvals (0.7.0, MV-234)
 
 `mst approvals on` (per identity, on this machine; off by default) sends each permission prompt of a session bound to an mstep issue to mstep too.
 - **Who answers:** the agent's owner (who signed it in here) or a workspace admin can **allow it once** or **deny it** in the web app, after confirming with a second factor.
 - **When nobody answers:** if nobody answers within the wait (default 120 s, `--wait`), or anything fails, the prompt is answered at the terminal as usual. Nothing else ever allows a call.
-- **Claude Code** shows its prompt at once; whichever answer comes first wins.
+- **Claude Code** shows its prompt at once, and whichever answer comes first wins. mst learns of an answer given at the terminal from the session's next events (the call running, another call, your next prompt), so until then an answer can still be recorded in mstep for a prompt the terminal already settled.
 - **Codex** holds its prompt until mstep answers or the wait ends.
 
-It runs as the synchronous `PermissionRequest` hook `mst hook permission-request --approve`; `PermissionDenied` tells mstep the terminal answered. It needs a profile with an `mst_` token and an mst with MV-234. An older mst refuses the flag, and the prompt is answered at the terminal. The monitor logs to `watch.log` and the MCP bridge to `mcp.log`.
+It runs as the synchronous `PermissionRequest` hook `mst hook permission-request --approve`. It needs a profile with an `mst_` token and an mst with MV-234. An older mst refuses the flag, and the prompt is answered at the terminal.
 
 ## Several agents on one machine
 
