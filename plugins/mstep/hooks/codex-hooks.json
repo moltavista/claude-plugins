@@ -60,6 +60,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "\"${PLUGIN_ROOT}/scripts/mst-run\" hook permission-request --agent codex --approve",
+            "timeout": 570
+          },
+          {
+            "type": "command",
             "command": "\"${PLUGIN_ROOT}/scripts/mst-run\" hook permission-request --agent codex",
             "async": true
           }

@@ -122,6 +122,37 @@
         ]
       }
     ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/mst-run",
+            "args": [
+              "hook",
+              "permission-request",
+              "--approve"
+            ],
+            "timeout": 570
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/mst-run",
+            "args": [
+              "hook",
+              "permission-denied"
+            ],
+            "async": true
+          }
+        ]
+      }
+    ],
     "SubagentStart": [
       {
         "hooks": [
