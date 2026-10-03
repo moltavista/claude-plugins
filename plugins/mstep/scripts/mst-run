@@ -6,7 +6,7 @@
 # ("$PLUGIN_ROOT/scripts/mst-run" hook stop --agent codex), Claude Code with
 # an args list.
 #
-# The MCP server needs mst: `mst mcp` bridges to https://mstep.moltavista.com/mcp
+# The MCP server needs mst: `mst mcp` bridges to https://fab.moltavista.com/mcp
 # as the identity mst resolves for the session (MST_TOKEN, MST_PROFILE, a .mst
 # file, your `mst login`). Without mst (or with an mst older than the
 # bridge), `mst-run mcp` answers every MCP request with an error that
@@ -16,7 +16,7 @@
 #
 # Lookup: $MST_BIN, `mst` on PATH, ~/.local/bin/mst (install.sh's default).
 
-INSTALL='curl -fsSL https://mstep.moltavista.com/install.sh | sh && mst login'
+INSTALL='curl -fsSL https://fab.moltavista.com/install.sh | sh && mst login'
 
 # mcp_error answers each JSON-RPC request on stdin with an error ($1).
 mcp_error() {

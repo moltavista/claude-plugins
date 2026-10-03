@@ -1,6 +1,6 @@
 {
   "name": "mstep",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "mstep issue tracker for Codex: MCP tools, live agent sessions on the issue (activity, plan, commits), decisions for humans, and human comments/stop delivered into the running session",
   "keywords": ["mstep", "issues", "agents", "human-in-the-loop"],
   "skills": "./skills/",
@@ -11,6 +11,6 @@
     "shortDescription": "Work mstep issues: live agent sessions, human decisions and steering",
     "developerName": "Møltavista",
     "category": "Productivity",
-    "websiteURL": "https://mstep.moltavista.com/docs/codex"
+    "websiteURL": "https://fab.moltavista.com/docs/codex"
   }
 }
