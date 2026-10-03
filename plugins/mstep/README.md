@@ -1,6 +1,6 @@
 # mstep plugin for Claude Code and Codex
 
-[mstep](https://mstep.moltavista.com) is Møltavista's agent-first issue tracker. This plugin lets Claude Code (and Codex) work mstep issues the way a teammate would:
+[mstep](https://fab.moltavista.com) is Møltavista's agent-first issue tracker. This plugin lets Claude Code (and Codex) work mstep issues the way a teammate would:
 
 - **MCP tools**: list, create and update issues and comments, edit descriptions, run an **agent session** on an issue, ask humans **decisions**, wait for their input. The server runs through the `mst` CLI (`mst mcp`), which signs in with mst's login.
 - **Live session on the issue**: hooks report what Claude does (tool actions, what is running right now, the task list as the plan, commits, pushes, pull requests, prompts typed at the terminal, compactions, loaded instruction files, final replies, errors) to the issue it works on. Credentials in what they report are redacted. Prompts typed at the terminal appear on the issue for everyone who can see it (a shared issue's audience and exports included); `MST_REPORT_PROMPTS=0` keeps a machine's prompts local. `MST_UPLOAD_IMAGES=0` keeps images local.
@@ -14,7 +14,7 @@
 The plugin needs the `mst` CLI (macOS and Linux, installed into `~/.local/bin`). Install it and sign in once:
 
 ```sh
-curl -fsSL https://mstep.moltavista.com/install.sh | sh
+curl -fsSL https://fab.moltavista.com/install.sh | sh
 mst login
 ```
 
@@ -29,14 +29,14 @@ Then install the plugin, either with `mst claude install` or in Claude Code:
 
 Run `/mcp` to check that the `plugin:mstep:mstep` server is connected. `mst setup` is a guided setup that covers the clients, your login, agent identities and worktree pins in one go.
 
-Without `mst`, the MCP server answers with an error that explains the install, and hooks and the monitor are silent no-ops. To use mstep without mst, add the MCP server by hand with the client's own OAuth: `claude mcp add --transport http mstep https://mstep.moltavista.com/mcp`.
+Without `mst`, the MCP server answers with an error that explains the install, and hooks and the monitor are silent no-ops. To use mstep without mst, add the MCP server by hand with the client's own OAuth: `claude mcp add --transport http mstep https://fab.moltavista.com/mcp`.
 
 ### Upgrading from 0.4 (the MCP server now runs through mst)
 
 Up to 0.4 the plugin connected to `https://mstep.moltavista.com/mcp` directly, with Claude Code's own OAuth. From 0.5 it starts `mst mcp`, a local stdio bridge that uses mst's login. **Install the new mst first**:
 
 ```sh
-curl -fsSL https://mstep.moltavista.com/install.sh | sh     # mst with `mst mcp`
+curl -fsSL https://fab.moltavista.com/install.sh | sh     # mst with `mst mcp`
 mst whoami                                                  # who sessions here act as
 ```
 
@@ -47,7 +47,7 @@ If the plugin updates before mst does, the mstep MCP server fails to start and `
 ## How it fits together
 
 1. At session start, the plugin's `SessionStart` hook (`mst hook session-start`) tells Claude its **mstep client session id** and **whom it acts as** ("You act in mstep as the mstep agent agentEngineer: profile agentEngineer from …/.mst"). It also records which Claude Code session this Claude process runs.
-2. The MCP server (`mst mcp`) forwards Claude's MCP calls to `https://mstep.moltavista.com/mcp` with the bearer credential of the same identity. It refreshes OAuth tokens and handles long waits (`wait_events`), cancellation and reconnects.
+2. The MCP server (`mst mcp`) forwards Claude's MCP calls to `https://fab.moltavista.com/mcp` with the bearer credential of the same identity. It refreshes OAuth tokens and handles long waits (`wait_events`), cancellation and reconnects.
 3. When Claude starts on an issue, it calls `session_start` with that id. The issue now shows a live agent session bound to this Claude Code session. The issue is assigned to Claude's identity if nobody had it; an issue assigned to someone else is never taken over, and Claude asks first.
 4. Hooks (`mst hook …`, run in the background) forward tool actions ("Running …" while a command runs), the task list, commits/pushes/PR links, permission waits, prompts typed at the terminal, compactions, loaded instruction files, final replies and errors to that session. When the Claude Code session exits, its mstep sessions are ended. The events added in 0.6.0 need an mst with MV-232; older versions ignore them. 0.7.0 adds `PermissionDenied` and the approval hook (below).
 5. The monitor (`mst watch`) streams mstep's agent events for the sessions bound to this Claude Code session. It prints one `[mstep] …` line per human message, stop request or decision answer, and per inbox event of the identity. Claude reacts even when idle.
@@ -82,7 +82,7 @@ claude                                             # there: agentEngineer
 mst run --as reviewer -- claude                    # ad hoc, any directory, own memory directory
 ```
 
-`mst whoami` shows who a session started in the current directory acts as, and why. `mst profiles` lists the identities with their expiry and running instances. `mst profiles rm <name>` revokes and deletes one. Guide: https://mstep.moltavista.com/docs/several-agents
+`mst whoami` shows who a session started in the current directory acts as, and why. `mst profiles` lists the identities with their expiry and running instances. `mst profiles rm <name>` revokes and deletes one. Guide: https://fab.moltavista.com/docs/several-agents
 
 ## Codex CLI
 
@@ -118,7 +118,7 @@ How it differs from Claude Code:
 - **Headless (`codex exec`)**: tools that need approval are refused; `mst codex install` approves `session_end` and `decision_cancel` in `config.toml`.
 - The plan comes from `update_plan`; permission waits from `PermissionRequest`; Esc from `Interrupt`.
 
-`mst codex status` shows the setup, the identity and running watchers; `mst codex uninstall` removes what `mst codex install` added. Details: https://mstep.moltavista.com/docs/codex
+`mst codex status` shows the setup, the identity and running watchers; `mst codex uninstall` removes what `mst codex install` added. Details: https://fab.moltavista.com/docs/codex
 
 ## Other servers
 
