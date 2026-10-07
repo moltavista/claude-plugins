@@ -54,6 +54,15 @@ If the plugin updates before mst does, the mstep MCP server fails to start and `
 
 Everything `mst` does in hooks is best effort: hooks never block Claude for more than about 2 s, always succeed, and log to `~/.config/mst/hook.log`. The one exception is the opt-in approval hook below. The monitor logs to `watch.log` and the MCP bridge to `mcp.log`.
 
+## Memory reminders (0.7.3, MV-519)
+
+Agents are meant to keep what they learn in mstep's memory (`memory_remember`), and the plugin reminds them at the two points where it gets lost. Each reminder is a sentence or two, given once:
+
+- **Ending a session:** after `session_end`, once per mstep session. In Claude Code a synchronous `PostToolUse` hook that matches only that tool runs `mst hook post-tool-use --remind`. In Codex the synchronous `--deliver` hook adds the reminder.
+- **After a compaction:** `SessionStart` runs again (source `compact`) and adds it to the context, once per client session, while the session is bound to an issue.
+
+The `work-on-issue` skill also has the agent read `memory_context` and `memory_search` the area before it starts, and save what it learned before `session_end`. This needs an mst with MV-519. An older mst refuses `--remind`, and Claude Code then logs a hook error on `session_end`.
+
 ## Remote approvals (0.7.0, MV-234)
 
 `mst approvals on` (per identity, on this machine; off by default) sends each permission prompt of a session bound to an mstep issue to mstep too.
