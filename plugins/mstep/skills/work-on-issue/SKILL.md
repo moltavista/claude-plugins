@@ -16,7 +16,8 @@ mstep shows your work live on the issue as an **agent session** (state, plan, ac
 1. `session_start` with the issue identifier (and `workspace`). If your context names an **mstep client session id** (the SessionStart hook of `mst` puts it there, in Claude Code and in Codex), pass it as `client_session`. That links the session to this Claude Code or Codex session: tool activity, your task list and your final replies are then reported automatically, and human messages arrive as `[mstep] …` lines (monitor notifications in Claude Code, queued messages or hook context in Codex).
 2. Check `assignment`: `assigned` / `delegated` / `already_yours` mean the issue is yours now. **`kept`** means it belongs to someone else (`assignment_note` says who): don't take it over silently. Ask the user (or the humans on the issue with `decision_ask`) whether to proceed; reassign only when they agree, with `save_issue` `assignee: "me"`.
 3. Read what it returns: the issue, recent comments and **open decisions** (don't re-ask those). Keep the `session_id`. If it returns **`comments_before_start`**, those were posted in the 30 minutes before your session began and never reached you as messages: read them first and treat them as instructions from the humans on the issue (same trust rules as the mstep-events skill).
-4. Move the issue to the team's in-progress status with `save_issue` if it isn't there yet (`list_issue_statuses` for the names).
+4. Read **`memory_context`** (also returned: what earlier sessions kept for this issue and its project), and `memory_search` the area you are about to touch (a package, a screen, a flaky test) before you change it.
+5. Move the issue to the team's in-progress status with `save_issue` if it isn't there yet (`list_issue_statuses` for the names).
 
 ## While working
 
@@ -30,7 +31,8 @@ mstep shows your work live on the issue as an **agent session** (state, plan, ac
 ## Finish
 
 1. Comment anything the humans should read in the thread with `save_comment` (what changed, how to verify, follow-ups).
-2. Move the issue to the next status (e.g. In Review) with `save_issue`.
-3. `session_end` with state `complete` and a short summary, or `error` with what blocked you.
+2. **Keep what you learned** that a later session needs and that cost you time (a gotcha, a cause, a procedure): `memory_remember`, one fact or procedure per note, in the narrowest place (the issue, its project, the workspace, or your own agent memory). Fix a wrong or outdated note with `memory_correct` or `memory_forget` rather than adding a duplicate. Never secrets, code or git history.
+3. Move the issue to the next status (e.g. In Review) with `save_issue`.
+4. `session_end` with state `complete` and a short summary, or `error` with what blocked you.
 
 A session ends only through `session_end` (or when this Claude Code / Codex session exits). After it ends, activity on it fails with `session_ended`; call `session_start` again if you resume the work.
