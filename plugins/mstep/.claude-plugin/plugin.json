@@ -1,13 +1,18 @@
 {
   "name": "mstep",
-  "displayName": "mstep",
-  "version": "0.7.3",
-  "description": "mstep issue tracker for Claude Code: MCP tools, live agent sessions on the issue (activity, plan, commits), decisions for humans, and human comments/stop delivered into the running session",
+  "displayName": "fabbrica (mstep compatibility)",
+  "version": "0.8.0",
+  "description": "Compatibility entry for the fabbrica plugin: MCP tools, agent sessions, human decisions and steering. Install only fab or mstep.",
   "author": {
-    "name": "Møltavista",
+    "name": "M\u00f8ltavista",
     "url": "https://git.teixos.net/moltavista"
   },
   "homepage": "https://git.teixos.net/moltavista/claude-plugins",
   "repository": "https://git.teixos.net/moltavista/claude-plugins",
-  "keywords": ["mstep", "issues", "agents", "human-in-the-loop"]
+  "keywords": [
+    "mstep",
+    "issues",
+    "agents",
+    "human-in-the-loop"
+  ]
 }
