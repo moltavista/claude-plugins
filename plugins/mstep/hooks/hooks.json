@@ -59,6 +59,21 @@
             "async": true
           }
         ]
+      },
+      {
+        "matcher": "mcp__.*mstep.*__session_end",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/mst-run",
+            "args": [
+              "hook",
+              "post-tool-use",
+              "--remind"
+            ],
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
