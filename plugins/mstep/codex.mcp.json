@@ -15,7 +15,14 @@
         "XDG_CONFIG_HOME",
         "MST_CREDENTIAL_STORE",
         "MST_BIN",
-        "MST_DEBUG"
+        "MST_DEBUG",
+        "FAB_PROFILE",
+        "FAB_SERVER",
+        "FAB_CONFIG_DIR",
+        "FAB_MANAGED_FOLDER",
+        "FAB_MANAGED_HARNESS",
+        "FAB_MANAGED_GENERATION",
+        "FAB_CODEX_SOCKET"
       ],
       "startup_timeout_sec": 30,
       "tool_timeout_sec": 120
