@@ -1,6 +1,6 @@
 {
   "name": "fab",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "fabbrica issue tracker: MCP tools, live agent sessions, human decisions and steering, through the fab CLI or compatible mst.",
   "keywords": [
     "fab",

@@ -1,6 +1,5 @@
 """Managed bindings survive the minimal environment of the stdio client."""
 import json
-import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -21,7 +20,8 @@ class ManagedCodexEnvironmentTests(unittest.TestCase):
             binary.chmod(0o700)
             parent = {key: 'fixture-' + key for key in BINDINGS}
             parent['MST_BIN'] = str(binary)
-            env = {'HOME': temp, 'PATH': os.environ['PATH']}
+            # Do not select a real preferred fab binary from the developer's PATH.
+            env = {'HOME': temp, 'PATH': temp + ':/usr/bin:/bin'}
             env.update({key: value for key, value in parent.items() if key in server['env_vars']})
             result = subprocess.run([server['command'], *server['args']], env=env,
                                     input='', capture_output=True, text=True, timeout=10)
