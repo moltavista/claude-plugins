@@ -1,0 +1,77 @@
+#!/bin/sh
+# fabbrica plugin helper: prefer FAB_BIN/fab, retain MST_BIN/mst compatibility.
+# exec preserves the running CLI process, its arguments and stdin; no watcher
+# restart or profile-store migration happens here. Tokens remain environment-only.
+# The installer still provides mst during the phased rollout.
+
+INSTALL='curl -fsSL https://fab.moltavista.com/install.sh | sh && mst login'
+
+# mcp_error answers each JSON-RPC request on stdin with an error ($1).
+mcp_error() {
+  echo "$1" >&2
+  while IFS= read -r l; do
+    id=$(printf %s "$l" | sed -nE 's/^[{] *"jsonrpc" *: *"2.0" *, *"id" *: *([0-9]+|"[^"]*").*/\1/p; s/.*"method" *: *"initialize".*"id" *: *([0-9]+|"[^"]*").*/\1/p' | head -n 1)
+    if [ -n "$id" ]; then
+      printf '{"jsonrpc":"2.0","id":%s,"error":{"code":-32000,"message":"%s"}}\n' "$id" "$1"
+    fi
+  done
+  exit 0
+}
+
+# Older mst binaries only understand MST_*. Mirror explicitly set FAB_* values,
+# including empty values, into the legacy family. Values stay in the environment.
+if [ "${FAB_PROFILE+set}" = set ]; then MST_PROFILE=$FAB_PROFILE; export MST_PROFILE; fi
+if [ "${FAB_TOKEN+set}" = set ]; then MST_TOKEN=$FAB_TOKEN; export MST_TOKEN; fi
+if [ "${FAB_SERVER+set}" = set ]; then MST_SERVER=$FAB_SERVER; export MST_SERVER; fi
+if [ "${FAB_CONFIG_DIR+set}" = set ]; then MST_CONFIG_DIR=$FAB_CONFIG_DIR; export MST_CONFIG_DIR; fi
+if [ "${FAB_CREDENTIAL_STORE+set}" = set ]; then MST_CREDENTIAL_STORE=$FAB_CREDENTIAL_STORE; export MST_CREDENTIAL_STORE; fi
+if [ "${FAB_DEBUG+set}" = set ]; then MST_DEBUG=$FAB_DEBUG; export MST_DEBUG; fi
+if [ "${FAB_REPORT_PROMPTS+set}" = set ]; then MST_REPORT_PROMPTS=$FAB_REPORT_PROMPTS; export MST_REPORT_PROMPTS; fi
+if [ "${FAB_UPLOAD_IMAGES+set}" = set ]; then MST_UPLOAD_IMAGES=$FAB_UPLOAD_IMAGES; export MST_UPLOAD_IMAGES; fi
+if [ "${FAB_WATCH_INBOX+set}" = set ]; then MST_WATCH_INBOX=$FAB_WATCH_INBOX; export MST_WATCH_INBOX; fi
+if [ "${FAB_WATCH_INBOX_KINDS+set}" = set ]; then MST_WATCH_INBOX_KINDS=$FAB_WATCH_INBOX_KINDS; export MST_WATCH_INBOX_KINDS; fi
+if [ "${FAB_AUTO_UPDATE+set}" = set ]; then MST_AUTO_UPDATE=$FAB_AUTO_UPDATE; export MST_AUTO_UPDATE; fi
+if [ "${FAB_CODEX_BIN+set}" = set ]; then MST_CODEX_BIN=$FAB_CODEX_BIN; export MST_CODEX_BIN; fi
+if [ "${FAB_CODEX_LIVE+set}" = set ]; then MST_CODEX_LIVE=$FAB_CODEX_LIVE; export MST_CODEX_LIVE; fi
+if [ "${FAB_COMPACT_INJECT+set}" = set ]; then MST_COMPACT_INJECT=$FAB_COMPACT_INJECT; export MST_COMPACT_INJECT; fi
+if [ "${FAB_HELPER_REFRESH+set}" = set ]; then MST_HELPER_REFRESH=$FAB_HELPER_REFRESH; export MST_HELPER_REFRESH; fi
+if [ "${FAB_KEYCHAIN+set}" = set ]; then MST_KEYCHAIN=$FAB_KEYCHAIN; export MST_KEYCHAIN; fi
+if [ "${FAB_MCP_RESUME+set}" = set ]; then MST_MCP_RESUME=$FAB_MCP_RESUME; export MST_MCP_RESUME; fi
+if [ "${FAB_TERM+set}" = set ]; then MST_TERM=$FAB_TERM; export MST_TERM; fi
+
+old=""
+for m in "${FAB_BIN:-}" "$(command -v fab 2>/dev/null || true)" "$HOME/.local/bin/fab" "${MST_BIN:-}" "$(command -v mst 2>/dev/null || true)" "$HOME/.local/bin/mst"; do
+  if [ -n "$m" ] && [ -x "$m" ]; then
+    if [ "${1:-}" = "mcp" ] && ! "$m" mcp --help >/dev/null 2>&1; then
+      # An mst from before the MCP bridge: keep looking, then explain.
+      old="$m"
+      continue
+    fi
+    exec "$m" "$@"
+  fi
+done
+
+case "$1 ${2:-}" in
+  "mcp "*)
+    if [ -n "$old" ]; then
+      mcp_error "fabbrica: the MCP server needs a newer fab or mst CLI bridge. Update it: $INSTALL (then reconnect: /mcp in Claude Code, or restart Codex)"
+    fi
+    mcp_error "fabbrica: the MCP server needs the fab CLI (or compatible mst), which is not installed. Install it: $INSTALL (then reconnect: /mcp in Claude Code, or restart Codex)"
+    ;;
+  "hook session-start")
+    cat >/dev/null
+    marker="${CLAUDE_PLUGIN_DATA:-${TMPDIR:-${XDG_CACHE_HOME:-$HOME/.cache}/fab}}/.mst-missing-hint"
+    if [ ! -e "$marker" ]; then
+      mkdir -p "$(dirname "$marker")" 2>/dev/null && : >"$marker" 2>/dev/null
+      echo "The fabbrica plugin's helper CLI (fab or mst) is not installed, so the fabbrica MCP tools, tool-activity reporting and live human comments are unavailable. The user can install it with: $INSTALL"
+    fi
+    ;;
+  "watch "*)
+    # Stay alive silently until Claude Code ends the session.
+    while :; do sleep 3600; done
+    ;;
+  *)
+    cat >/dev/null 2>&1 || true
+    ;;
+esac
+exit 0

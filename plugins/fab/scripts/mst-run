@@ -1,0 +1,3 @@
+#!/bin/sh
+# Compatibility entrypoint for cached hook and monitor configurations.
+exec "$(dirname "$0")/fab-run" "$@"

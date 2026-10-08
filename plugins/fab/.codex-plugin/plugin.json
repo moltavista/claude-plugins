@@ -1,0 +1,22 @@
+{
+  "name": "fab",
+  "version": "0.8.0",
+  "description": "fabbrica issue tracker: MCP tools, live agent sessions, human decisions and steering, through the fab CLI or compatible mst.",
+  "keywords": [
+    "fab",
+    "fabbrica",
+    "issues",
+    "agents",
+    "human-in-the-loop"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./codex.mcp.json",
+  "hooks": "./hooks/codex-hooks.json",
+  "interface": {
+    "displayName": "fabbrica",
+    "shortDescription": "fabbrica issues, live sessions and human steering",
+    "developerName": "M\u00f8ltavista",
+    "category": "Productivity",
+    "websiteURL": "https://fab.moltavista.com/docs/codex"
+  }
+}

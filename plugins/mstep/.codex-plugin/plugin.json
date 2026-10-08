@@ -1,15 +1,20 @@
 {
   "name": "mstep",
-  "version": "0.7.4",
-  "description": "mstep issue tracker for Codex: MCP tools, live agent sessions on the issue (activity, plan, commits), decisions for humans, and human comments/stop delivered into the running session",
-  "keywords": ["mstep", "issues", "agents", "human-in-the-loop"],
+  "version": "0.8.0",
+  "description": "Compatibility entry for the fabbrica plugin: MCP tools, agent sessions, human decisions and steering. Install only fab or mstep.",
+  "keywords": [
+    "mstep",
+    "issues",
+    "agents",
+    "human-in-the-loop"
+  ],
   "skills": "./skills/",
   "mcpServers": "./codex.mcp.json",
   "hooks": "./hooks/codex-hooks.json",
   "interface": {
-    "displayName": "mstep",
-    "shortDescription": "Work mstep issues: live agent sessions, human decisions and steering",
-    "developerName": "Møltavista",
+    "displayName": "fabbrica (mstep compatibility)",
+    "shortDescription": "fabbrica issues, live sessions and human steering",
+    "developerName": "M\u00f8ltavista",
     "category": "Productivity",
     "websiteURL": "https://fab.moltavista.com/docs/codex"
   }
