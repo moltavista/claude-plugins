@@ -24,9 +24,21 @@ Call `decision_ask`:
 - `recipients` only when a specific person or team must decide (names, emails or team keys); default is anyone with access.
 - `wait` (default true) holds the call until someone answers. In Claude Code, after about two minutes the call moves to the background: keep working on anything that does not depend on the answer; the result arrives as a task notification. In Codex, pass `max_wait_seconds` below the MCP tool timeout (e.g. 100; the plugin sets 120 s). If it returns `status: "pending"`, continue and later call `decision_wait` with the id (same limit in Codex).
 
+## Safe deadline defaults
+
+For a genuinely safe fallback, supply **both** `deadline` and `default_option`; otherwise omit both and wait for a person. This is explicit opt-in for that one decision, never a project setting or permission for an agent to answer it.
+
+- `deadline`: an RFC 3339 time, or minutes/hours from now, from 5 minutes to 30 days. Use `48h` for two days, **never `2d`**.
+- `default_option`: an existing option's label (`Yes` or `No` for `yes_no`). Defaults work only for `single` and `yes_no`, never `multi` or `free_text`. A recommendation alone is not a default.
+- Use a default only when taking that option without a person is safe and reversible. State the fallback and its consequence in the question/context so the recipients know what silence means. Do not use an automatic answer as approval for destructive actions, security changes, models, credentials or tool permissions.
+
+If the choice already needs a decision, a safe keep-current-setting fallback could add `"deadline": "48h", "default_option": "Keep the current setting"` to a `single` question with that exact option label. The server, not the agent, applies it after the deadline if the decision is still open.
+
 ## When the answer arrives
 
 - The same answer can reach you twice: as the tool result and as an `[mstep] decision on MST-12 answered by …` line (same decision id). Act on it once.
+- An answer may say **"answered automatically at its deadline"** (`answered_automatically: true`, reason `deadline`). Follow the selected safe default once, preserving that provenance; do not describe it as a person's answer or treat it as human approval.
 - Follow the chosen option; read any free-text note, it can refine or override the options.
 - `canceled`: the question is moot. Re-read the issue and comments, re-plan, and only ask again if you are still blocked.
+- A default-bearing decision is canceled if its asker can no longer answer (lost access, deactivated member, disabled agent or inactive owner). Stop relying on its fallback; re-read access and scope. Do not switch identities or re-ask just to bypass that loss of authority.
 - Don't ask the same question again while it is open (`get_issue` lists open decisions); `decision_cancel` one you no longer need.
