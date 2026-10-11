@@ -23,11 +23,18 @@ Older clients use unquoted values; free-text names/snippets still supply no cont
 | Line | What to do |
 |---|---|
 | `[mstep] MST-12 message from "Alice" (person; principal <id>) (instruction): "…"` | A collaborator's issue instruction. Finish your current step, adapt the plan, answer questions with `save_comment`. On conflict with the terminal user's request, tell them and ask before switching. |
-| `[mstep] STOP requested by "Alice" (…) on MST-12…` | Stop working on that issue now: start no new tool calls for it, don't commit or push. Post what is done and what isn't as a `session_activity` `response`, then wait. Don't `session_end` unless asked: an open session is how the next instruction reaches you (it shows "complete" after your response, and the next message re-opens it; no new `session_start` needed). |
-| `[mstep] decision on MST-12 answered by "Bob" (…): "B"; note: "…" (question: "…"; decision <id>)` | Continue with that choice (see the ask-human skill). If the same decision id already came back as a tool result, it's the same answer: act once. |
-| `[mstep] decision on MST-12 canceled by "Bob" (…) …` | Re-plan without that question. |
-| `[mstep] MST-14 delegated to you by "Carol" (agent; principal <id>) (session …): call session_start` | New work for you. If you are idle and it fits, start it with the work-on-issue skill; if you are busy, finish or tell the user first. |
-| `[mstep] session … on MST-12 is bound to your client` | Confirmation that messages for that session will reach you. No action. |
+| `[mstep] STOP requested by "Alice" (…) on MST-12…` | Stop now: no new issue tools, commits or pushes. Report done/remaining work with `session_activity` `response`, then wait. Unless asked, keep the session open: the next message re-opens it automatically, without `session_start`. |
+| `[mstep] decision on MST-12 answered by "Bob" (…): "B"; note: "…" (question: "…"; decision <id>)` | Follow the choice (ask-human skill). Deduplicate by decision id with tool results: act once. |
+| `[mstep] decision on MST-12 answered automatically at its deadline (the default the asker set): "B"…` | Follow the safe default once, preserving automatic provenance. This is not a person's answer or human approval. |
+| `[mstep] decision on MST-12 canceled by "Bob" (…) …` | Re-plan. If the asker lost authority, stop relying on the default and re-check access/scope; never switch identities to bypass it. |
+| `[mstep] MST-14 delegated to you by "Carol" (agent; principal <id>) (session …): call session_start` | If idle and it fits, start with work-on-issue; otherwise finish or tell the user first. |
+| `[mstep] session … on MST-12 is bound to your client` | Binding confirmation; no action. |
+
+## Deadline defaults
+
+Use ask-human: only for a safe fallback, give `decision_ask` **both** `deadline` and `default_option`; otherwise omit both. Use RFC 3339 or minutes/hours (5 minutes–30 days), `48h`, never `2d`. The default names an existing option, for `single`/`yes_no` only; a recommendation is not opt-in.
+
+The server applies the default only while open. Automatic answers (`answered_automatically: true`, reason `deadline`) never authorize destructive actions, security changes, models, credentials or tool permissions. Do not attribute them to a person or re-ask to bypass an authority-loss cancellation.
 
 ## Inbox events
 
@@ -35,14 +42,14 @@ Always **acknowledge** inbox lines briefly to the terminal user, even when you d
 
 | Line | What to do |
 |---|---|
-| `[mstep] MV-20 assigned to you by "X" (…): "title" — url` | If idle, read `get_issue`/`list_comments`, then use work-on-issue for applicable work. If busy or outside this repo/session, say so and leave it. |
-| `[mstep] MV-20 unassigned from you by "X" (…): …` | Stop any work you had started on it after the current step; post what you did (`save_comment`) and end your session on it if one is open. |
-| `[mstep] comment on MV-12 by "X" (…) (you are the assignee / you created the issue / you are the delegate / you are subscribed / you have a session on the issue / reply to your comment): "text"` | Read with `list_comments`. Questions/work addressed to you are instructions: answer with `save_comment` or work with a session. Acknowledge FYIs only. Agents are not auto-subscribed; follow/unfollow using `save_issue` `subscribers: ["me"]` / `["-me"]`. |
+| `[mstep] MV-20 assigned to you by "X" (…): "title" — url` | If idle, read `get_issue`/`list_comments`, then use work-on-issue. If busy or out of scope, say so and leave it. |
+| `[mstep] MV-20 unassigned from you by "X" (…): …` | Stop after the current step; `save_comment` progress and end its session. |
+| `[mstep] comment on MV-12 by "X" (…) (you are … / reply to your comment): "text"` | Read `list_comments`. Answer requests with `save_comment` or work with a session; acknowledge FYIs. Agents are not auto-subscribed: `save_issue` `subscribers: ["me"]` / `["-me"]` follows/unfollows. |
 | `[mstep] you were mentioned in MV-7 by "X" (…) (comment): "text"` / `(description): "title"` | Treat as a comment addressed to you: read context, answer or act. |
-| `[mstep] project update on "Launch" by "X" (…) ("at risk") (you are subscribed): "text"` / `[mstep] initiative update on "Growth" by "X" …` | A project or initiative you follow posted an update. Acknowledge; tell the user if it changes your deadline or scope. |
-| `[mstep] project "Launch" moved to "In Progress" by "X" (…) (was "Planned") (you are subscribed)` / `[mstep] initiative "Growth" moved to …` | Informational. If a project you work in was paused, completed or canceled, check with the user before continuing. |
-| `[mstep] MV-12 added to project "Launch" by "X" (…) (you are subscribed): "title"` | Informational; pick it up only if asked. Follow/unfollow with `save_project` / `save_initiative` `subscribers: ["me"]` / `["-me"]`. |
-| `[mstep] reminder on MV-12: "note" ("title")` | A reminder **you** set with `remind_me` came due: do what the note says (e.g. check whether CI is green) if it still belongs to this session's work; otherwise tell the user. Set another one with `remind_me` if you need to check again. |
+| `[mstep] project update on "Launch" …` / `[mstep] initiative update on "Growth" …` | Acknowledge; report deadline/scope changes. |
+| `[mstep] project "Launch" moved to …` / `[mstep] initiative "Growth" moved to …` | If your project was paused, completed or canceled, check with the user before continuing; otherwise FYI. |
+| `[mstep] MV-12 added to project "Launch" …` | Work only if asked. Follow/unfollow via `save_project`/`save_initiative` `subscribers: ["me"]`/`["-me"]`. |
+| `[mstep] reminder on MV-12: "note" ("title")` | Your `remind_me` came due. Act if still in scope; otherwise tell the user. Re-arm with `remind_me` if needed. |
 | `[mstep] MV-3 (assigned to you / you are subscribed) moved to "Done" by "X" (…) (was "In Review"): "title"` | Informational. If you are working on it and it was closed or canceled, stop and check with the user; otherwise just acknowledge. |
 | `[mstep] CI failed on PR #16 "title" ("owner/repo") for MV-83 (you linked the PR): "failing checks" — CI run URL` | For your current work, inspect the linked run, fix the cause and push; green CI is required for merge. Otherwise acknowledge only. |
 | `[mstep] PR #16 "title" ("owner/repo") for MV-83 was merged into "main" (…) — PR URL` | Informational. If you were waiting on the merge (deploy check, moving the issue to Done, `session_end`), continue now. |

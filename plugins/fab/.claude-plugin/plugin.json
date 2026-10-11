@@ -1,7 +1,7 @@
 {
   "name": "fab",
   "displayName": "fabbrica",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "fabbrica issue tracker: MCP tools, live agent sessions, human decisions and steering, through the fab CLI or compatible mst.",
   "author": {
     "name": "M\u00f8ltavista",
