@@ -44,7 +44,7 @@ Always **acknowledge** inbox lines briefly to the terminal user, even when you d
 |---|---|
 | `[mstep] MV-20 assigned to you by "X" (…): "title" — url` | If idle, read `get_issue`/`list_comments`, then use work-on-issue. If busy or out of scope, say so and leave it. |
 | `[mstep] MV-20 unassigned from you by "X" (…): …` | Stop after the current step; `save_comment` progress and end its session. |
-| `[mstep] comment on MV-12 by "X" (…) (you are … / reply to your comment): "text"` | Read `list_comments`. Answer requests with `save_comment` or work with a session; acknowledge FYIs. Agents are not auto-subscribed: `save_issue` `subscribers: ["me"]` / `["-me"]` follows/unfollows. |
+| `[mstep] comment on MV-12 by "X" (…) (you are … / reply to your comment): "text"` | Read `list_comments`. Answer requests addressed to you with `save_comment` or work with a session; acknowledge FYIs. Agents are not auto-subscribed: `save_issue` `subscribers: ["me"]` / `["-me"]` follows/unfollows. |
 | `[mstep] you were mentioned in MV-7 by "X" (…) (comment): "text"` / `(description): "title"` | Treat as a comment addressed to you: read context, answer or act. |
 | `[mstep] project update on "Launch" …` / `[mstep] initiative update on "Growth" …` | Acknowledge; report deadline/scope changes. |
 | `[mstep] project "Launch" moved to …` / `[mstep] initiative "Growth" moved to …` | If your project was paused, completed or canceled, check with the user before continuing; otherwise FYI. |
