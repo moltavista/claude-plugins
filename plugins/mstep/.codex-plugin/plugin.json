@@ -1,6 +1,6 @@
 {
   "name": "mstep",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Compatibility entry for the fabbrica plugin: MCP tools, agent sessions, human decisions and steering. Install only fab or mstep.",
   "keywords": [
     "mstep",
