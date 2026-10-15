@@ -22,6 +22,4 @@ Install **one** entry. Existing `mstep@moltavista` installs keep working as a co
 
 See [the fab plugin guide](plugins/fab) for identities, hook privacy, approvals, Codex and troubleshooting. The [compatibility guide](plugins/mstep) covers existing installs.
 
-The [Forgejo repository](https://git.teixos.net/moltavista/claude-plugins) is the source for maintainers. Its stable branch and tags are mirrored to the public GitHub repository; users can install without a Forgejo account.
-
 Maintainers: run `python3 -m unittest discover -s tests`, `claude plugin validate .`, and validate both plugin directories with a scratch home. Test marketplace installation and MCP listing with a scratch `CODEX_HOME`. Never update a person's live harness during validation. Keep both entries' bridge, hooks, monitors and skills identical and bump their Claude and Codex manifest versions together. The final mstep bundle PR updates its embedded Codex assets and direct configuration after this plugin transition ships.
