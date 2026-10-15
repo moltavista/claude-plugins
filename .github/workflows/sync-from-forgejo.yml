@@ -5,8 +5,7 @@ on:
     - cron: "17,47 * * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
+permissions: {}
 
 concurrency:
   group: marketplace-sync
@@ -15,6 +14,9 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,3 +46,78 @@ jobs:
             git push origin "$source:refs/heads/main"
           fi
           git push origin --tags
+
+  report:
+    name: Report mirror failure or recovery
+    needs: sync
+    if: ${{ always() && (needs.sync.result == 'success' || needs.sync.result == 'failure') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      # Independent of checkout: a failed checkout must still open an incident.
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          SYNC_RESULT: ${{ needs.sync.result }}
+        with:
+          # A timed-out POST may already have created the issue. The next
+          # scheduled lookup recovers it; never replay a creation blindly.
+          retries: 0
+          script: |
+            const status = process.env.SYNC_RESULT;
+            if (!['success', 'failure'].includes(status)) throw new Error('Unexpected sync result');
+            if (context.repo.owner !== 'moltavista' || context.repo.repo !== 'claude-plugins') {
+              throw new Error('Unexpected repository: incident reporting is fixed to the marketplace');
+            }
+            const title = 'Forgejo marketplace mirror is failing';
+            const label = 'marketplace-sync';
+            const begin = '<!-- marketplace-sync:begin -->';
+            const end = '<!-- marketplace-sync:end -->';
+            const args = { ...context.repo, request: { timeout: 10000 } };
+            let incident;
+            for (let page = 1; page <= 5; page++) {
+              const { data } = await github.rest.issues.listForRepo({
+                ...args, labels: label, state: 'all', sort: 'updated', direction: 'desc', per_page: 100, page,
+              });
+              incident = data.find(issue => !issue.pull_request && issue.title === title &&
+                issue.user?.login === 'github-actions[bot]' && issue.user?.type === 'Bot' &&
+                typeof issue.body === 'string' && issue.body.includes(begin));
+              if (incident || data.length < 100) break;
+              if (page === 5) throw new Error('Incident lookup exceeded its bound; refusing to create a duplicate');
+            }
+            if (status === 'success' && (!incident || incident.state === 'closed')) {
+              core.notice('Mirror healthy; no open incident');
+              return;
+            }
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const section = [
+              begin,
+              status === 'failure' ? '**Marketplace sync failed.** New installations may receive stale plugins.' : '**Marketplace sync recovered.** The sync completed successfully.',
+              '', `Latest run: ${run}`, `Checked: ${new Date().toISOString()}`, '',
+              'Inspect the run and fix the source in Forgejo. Do not force-push or edit this GitHub mirror.',
+              end,
+            ].join('\n');
+            let body = section;
+            if (incident) {
+              const old = incident.body;
+              const first = old.indexOf(begin), last = old.indexOf(end, first);
+              if (old.length > 16384 || last < first || old.indexOf(begin, first + begin.length) !== -1) {
+                throw new Error('Incident managed section is malformed or too large; refusing to overwrite it');
+              }
+              body = old.slice(0, first) + section + old.slice(last + end.length);
+              await github.rest.issues.update({ ...args, issue_number: incident.number, body,
+                state: status === 'failure' ? 'open' : 'closed',
+                ...(status === 'success' ? { state_reason: 'completed' } : {}),
+              });
+            } else {
+              try { await github.rest.issues.getLabel({ ...args, name: label }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ ...args, name: label, color: 'B60205',
+                  description: 'Forgejo marketplace sync incident, maintained by GitHub Actions' });
+              }
+              const { data } = await github.rest.issues.create({ ...args, title, body, labels: [label] });
+              incident = data;
+            }
+            core.notice(`Marketplace sync incident #${incident.number}: ${status}`);
