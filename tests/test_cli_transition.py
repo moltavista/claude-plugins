@@ -148,7 +148,7 @@ class TransitionTests(unittest.TestCase):
             self.assertEqual(claude['name'], name)
             self.assertEqual(codex['name'], name)
             self.assertEqual(claude['version'], codex['version'])
-            self.assertEqual(claude['version'], '0.8.4')
+            self.assertEqual(claude['version'], '0.8.5')
             self.assertEqual(set(json.loads((path / 'codex.mcp.json').read_text())['mcpServers']), {'mstep'})
             for relative in ['codex.mcp.json', '.mcp.json', 'hooks/hooks.json',
                              'hooks/codex-hooks.json', 'monitors/monitors.json', 'scripts/fab-run']:
