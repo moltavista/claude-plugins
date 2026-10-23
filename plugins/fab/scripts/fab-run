@@ -39,13 +39,41 @@ if [ "${FAB_KEYCHAIN+set}" = set ]; then MST_KEYCHAIN=$FAB_KEYCHAIN; export MST_
 if [ "${FAB_MCP_RESUME+set}" = set ]; then MST_MCP_RESUME=$FAB_MCP_RESUME; export MST_MCP_RESUME; fi
 if [ "${FAB_TERM+set}" = set ]; then MST_TERM=$FAB_TERM; export MST_TERM; fi
 
+# Codex recovery is optional. Native MCP arguments do not expand hook-only
+# PLUGIN_DATA; use an explicit validated home and the entry's fixed data name.
+# A help probe reads no stdin, starts no supervisor, discards all output and
+# kills an unresponsive candidate after two seconds.
+probe_cli() {
+  "$@" </dev/null >/dev/null 2>&1 &
+  probe_pid=$!
+  (sleep 2; kill -KILL "$probe_pid" 2>/dev/null) >/dev/null 2>&1 &
+  probe_timer=$!
+  wait "$probe_pid" 2>/dev/null
+  probe_status=$?
+  kill "$probe_timer" 2>/dev/null || true
+  wait "$probe_timer" 2>/dev/null || true
+  return "$probe_status"
+}
+recovery_home=
+case "${CODEX_HOME:-}" in
+  /*) case "$CODEX_HOME" in *'${'*|*/../*|*/./*|*/..|*/.) ;; *) recovery_home=${CODEX_HOME%/} ;; esac ;;
+esac
+recovery_entry=
+case "$0" in fab-mcp) recovery_entry=fab-moltavista ;; mstep-mcp) recovery_entry=mstep-moltavista ;; esac
+
 old=""
 for m in "${FAB_BIN:-}" "$(command -v fab 2>/dev/null || true)" "$HOME/.local/bin/fab" "${MST_BIN:-}" "$(command -v mst 2>/dev/null || true)" "$HOME/.local/bin/mst"; do
   if [ -n "$m" ] && [ -x "$m" ]; then
-    if [ "${1:-}" = "mcp" ] && ! "$m" mcp --help >/dev/null 2>&1; then
+    if [ "${1:-}" = "mcp" ] && ! probe_cli "$m" mcp --help; then
       # An mst from before the MCP bridge: keep looking, then explain.
       old="$m"
       continue
+    fi
+    if [ "${1:-}" = mcp ] && [ -n "$recovery_home" ] && [ -n "$recovery_entry" ]; then
+      if probe_cli "$m" mcp --agent codex --state-dir "$recovery_home/plugins/data/$recovery_entry" --codex-home "$recovery_home" --help; then
+        exec "$m" mcp --agent codex --state-dir "$recovery_home/plugins/data/$recovery_entry" --codex-home "$recovery_home"
+      fi
+      echo "fabbrica: idle watcher recovery needs an updated CLI; MCP tools remain available." >&2
     fi
     exec "$m" "$@"
   fi

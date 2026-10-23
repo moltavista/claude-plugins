@@ -121,7 +121,7 @@ class TransitionTests(unittest.TestCase):
         cfg = json.loads((ROOT / 'plugins/mstep/codex.mcp.json').read_text())
         server = next(iter(cfg['mcpServers'].values()))
         self.assertEqual(server['args'][1], shared + '\n')
-        self.assertEqual(server['args'][2:], ['fab-mcp', 'mcp'])
+        self.assertEqual(server['args'][2:], ['mstep-mcp', 'mcp'])
 
     def test_codex_passes_both_environment_families(self):
         cfg = json.loads((ROOT / 'plugins/mstep/codex.mcp.json').read_text())
@@ -149,7 +149,7 @@ class TransitionTests(unittest.TestCase):
             self.assertEqual(codex['name'], name)
             self.assertEqual(claude['version'], codex['version'])
             self.assertEqual(set(json.loads((path / 'codex.mcp.json').read_text())['mcpServers']), {'mstep'})
-            for relative in ['codex.mcp.json', '.mcp.json', 'hooks/hooks.json',
+            for relative in ['.mcp.json', 'hooks/hooks.json',
                              'hooks/codex-hooks.json', 'monitors/monitors.json', 'scripts/fab-run']:
                 self.assertEqual((path / relative).read_bytes(),
                                  (ROOT / 'plugins/mstep' / relative).read_bytes())
@@ -168,6 +168,26 @@ class TransitionTests(unittest.TestCase):
             skill = (path / 'skills/work-on-issue/SKILL.md').read_text()
             self.assertIn('memory_search', skill)
             self.assertIn('memory_remember', skill)
+
+    def test_codex_recovery_uses_entry_specific_state_and_explicit_home(self):
+        self.binary('fab', 'fab')
+        codex_home = str(self.home / 'codex space')
+        for entry in ['fab', 'mstep']:
+            server = json.loads((ROOT / 'plugins' / entry / 'codex.mcp.json').read_text())['mcpServers']['mstep']
+            r = self.run_launcher([server['command'], *server['args']], CODEX_HOME=codex_home)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('mcp --agent codex --state-dir ' + codex_home + '/plugins/data/' + entry + '-moltavista --codex-home ' + codex_home, r.stdout)
+            self.assertIn('CODEX_HOME', server['env_vars'])
+
+    def test_old_cli_keeps_tools_and_one_recovery_hint(self):
+        binary = self.bin / 'fab'
+        binary.write_text('#!/bin/sh\ncase "$*" in *--agent*) exit 2;; *--help*) exit 0;; esac\nprintf "tools-work\\n"\n')
+        binary.chmod(0o700)
+        server = json.loads((ROOT / 'plugins/fab/codex.mcp.json').read_text())['mcpServers']['mstep']
+        r = self.run_launcher([server['command'], *server['args']], CODEX_HOME=str(self.home / 'codex'))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(r.stdout, 'tools-work\n')
+        self.assertEqual(r.stderr.count('idle watcher recovery needs an updated CLI'), 1)
 
 
 if __name__ == '__main__':
