@@ -1,6 +1,6 @@
 {
   "name": "fab",
-  "version": "0.8.6",
+  "version": "0.8.7",
   "description": "fabbrica issue tracker: MCP tools, live agent sessions, human decisions and steering, through the fab CLI or compatible mst.",
   "keywords": [
     "fab",
@@ -15,7 +15,7 @@
   "interface": {
     "displayName": "fabbrica",
     "shortDescription": "fabbrica issues, live sessions and human steering",
-    "developerName": "M\u00f8ltavista",
+    "developerName": "Møltavista",
     "category": "Productivity",
     "websiteURL": "https://fab.moltavista.com/docs/codex"
   }
