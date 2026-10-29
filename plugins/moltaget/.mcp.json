@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "moltaget": {
+      "type": "http",
+      "url": "https://mget.moltavista.com/mcp"
+    }
+  }
+}

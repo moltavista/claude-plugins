@@ -1,0 +1,20 @@
+{
+  "name": "moltaget",
+  "displayName": "moltaget",
+  "version": "0.1.0",
+  "description": "Web scraping for agents: scrape, map, search, crawl and extract through moltaget's MCP server, with Google sign-in instead of pasted tokens.",
+  "author": {
+    "name": "Møltavista",
+    "url": "https://git.teixos.net/moltavista"
+  },
+  "homepage": "https://mget.moltavista.com/docs/mcp",
+  "repository": "https://git.teixos.net/moltavista/claude-plugins",
+  "keywords": [
+    "moltaget",
+    "mget",
+    "scraping",
+    "crawling",
+    "web-search",
+    "mcp"
+  ]
+}

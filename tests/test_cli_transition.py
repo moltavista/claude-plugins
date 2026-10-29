@@ -139,8 +139,8 @@ class TransitionTests(unittest.TestCase):
 
     def test_marketplace_offers_fab_and_one_cycle_mstep_alias(self):
         market = json.loads((ROOT / '.claude-plugin/marketplace.json').read_text())
-        names = {p['name']: p for p in market['plugins']}
-        self.assertEqual(set(names), {'fab', 'mstep'})
+        names = {p['name']: p for p in market['plugins'] if p['name'] in ('fab', 'mstep')}
+        self.assertEqual({p['name'] for p in market['plugins']}, {'fab', 'mstep', 'moltaget'})
         for name in names:
             path = ROOT / names[name]['source']
             claude = json.loads((path / '.claude-plugin/plugin.json').read_text())
