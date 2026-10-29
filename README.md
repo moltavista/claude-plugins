@@ -18,7 +18,15 @@ codex plugin marketplace add https://github.com/moltavista/claude-plugins.git
 codex plugin add fab@moltavista
 ```
 
-Install **one** entry. Existing `mstep@moltavista` installs keep working as a compatibility alias for one transition cycle; do not enable it alongside `fab@moltavista`, which would duplicate hooks and watchers. The MCP server remains named `mstep`, and live events retain the `[mstep]` prefix during this cycle. Switching entries does not migrate credentials, edit running agents or restart their watchers.
+Use the **moltaget** plugin to scrape, map, search and crawl the web through [moltaget](https://mget.moltavista.com)'s MCP server. Sign in with Google from `/mcp`; no token to copy.
+
+```
+/plugin install moltaget@moltavista
+```
+
+See [the moltaget plugin guide](plugins/moltaget).
+
+For fabbrica, install **one** entry. Existing `mstep@moltavista` installs keep working as a compatibility alias for one transition cycle; do not enable it alongside `fab@moltavista`, which would duplicate hooks and watchers. The MCP server remains named `mstep`, and live events retain the `[mstep]` prefix during this cycle. Switching entries does not migrate credentials, edit running agents or restart their watchers.
 
 See [the fab plugin guide](plugins/fab) for identities, hook privacy, approvals, Codex and troubleshooting. The [compatibility guide](plugins/mstep) covers existing installs.
 

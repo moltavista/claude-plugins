@@ -30,6 +30,20 @@
         "mstep",
         "human-in-the-loop"
       ]
+    },
+    {
+      "name": "moltaget",
+      "source": "./plugins/moltaget",
+      "description": "Web scraping for agents: scrape, map, search, crawl and extract through moltaget's MCP server, signed in with Google",
+      "category": "development",
+      "tags": [
+        "moltaget",
+        "mget",
+        "scraping",
+        "crawling",
+        "web-search",
+        "mcp"
+      ]
     }
   ]
 }
