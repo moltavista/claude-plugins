@@ -143,7 +143,7 @@ The MCP bridge talks to the server of the identity: `fab login --server https://
 - Monitors run only in interactive sessions (not with `-p`), and not on Bedrock, Vertex or Foundry.
 
 
-### Idle Codex watcher recovery (0.8.6)
+### Idle Codex watcher recovery (0.8.8)
 
 Deploy the MV-788 fab CLI before this plugin update. The Codex MCP launcher
 probes the complete recovery invocation using bounded `--help` calls. Older

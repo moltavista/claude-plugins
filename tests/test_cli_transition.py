@@ -189,6 +189,18 @@ class TransitionTests(unittest.TestCase):
         self.assertEqual(r.stdout, 'tools-work\n')
         self.assertEqual(r.stderr.count('idle watcher recovery needs an updated CLI'), 1)
 
+    def test_slow_cli_start_keeps_tools(self):
+        # MV-788 review: a cold start slower than the 2 s recovery probe is
+        # still a modern CLI; only a CLI without the MCP bridge counts as old.
+        binary = self.bin / 'fab'
+        binary.write_text('#!/bin/sh\ncase "$*" in *--agent*) exit 2;; *--help*) sleep 3; exit 0;; esac\nprintf "tools-work\\n"\n')
+        binary.chmod(0o700)
+        server = json.loads((ROOT / 'plugins/fab/codex.mcp.json').read_text())['mcpServers']['mstep']
+        r = self.run_launcher([server['command'], *server['args']], CODEX_HOME=str(self.home / 'codex'))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(r.stdout, 'tools-work\n')
+        self.assertNotIn('needs a newer fab or mst CLI bridge', r.stderr)
+
 
 if __name__ == '__main__':
     unittest.main()
