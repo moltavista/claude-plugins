@@ -141,3 +141,17 @@ The MCP bridge talks to the server of the identity: `fab login --server https://
 - Read `hook.log`, `watch.log` and `mcp.log` in the resolved CLI config directory (`FAB_CONFIG_DIR`, its legacy equivalent, or the default fab/existing mst directory).
 - Claude Code: `claude --debug` shows hook runs and MCP server output; `/plugin` → Errors lists load problems.
 - Monitors run only in interactive sessions (not with `-p`), and not on Bedrock, Vertex or Foundry.
+
+
+### Idle Codex watcher recovery (0.8.8)
+
+Deploy the MV-788 fab CLI before this plugin update. The Codex MCP launcher
+probes the complete recovery invocation using bounded `--help` calls. Older
+CLIs keep ordinary MCP forwarding and print one update hint. CODEX_HOME must be
+explicitly forwarded; missing or unresolved homes disable recovery.
+
+The bridge can repair previously authorized watchers for threads already loaded
+by its proved current Codex host. It never opens a thread or bypasses hook
+approval. Trusted lifecycle hooks must establish that authority first. An
+ambiguous app-server shutdown preserves issue bindings and message receipts.
+Set FAB_CODEX_LIVE=0 to disable live delivery and recovery.

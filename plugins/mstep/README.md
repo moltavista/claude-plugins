@@ -141,3 +141,9 @@ The MCP bridge talks to the server of the identity: `fab login --server https://
 - Read `hook.log`, `watch.log` and `mcp.log` in the resolved CLI config directory (`FAB_CONFIG_DIR`, its legacy equivalent, or the default fab/existing mst directory).
 - Claude Code: `claude --debug` shows hook runs and MCP server output; `/plugin` → Errors lists load problems.
 - Monitors run only in interactive sessions (not with `-p`), and not on Bedrock, Vertex or Foundry.
+
+
+Idle Codex recovery in 0.8.8 requires the MV-788 fab CLI first and trusted
+lifecycle hooks. The compatibility entry uses its own `mstep-moltavista` state
+root. An old CLI still forwards MCP; recovery never opens a thread or bypasses
+hook approval. Keep this plugin update unmerged until the CLI is shipped.

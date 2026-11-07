@@ -67,8 +67,8 @@ func TestSensitiveHookReleaseVersion(t *testing.T) {
 			var manifest struct {
 				Version string `json:"version"`
 			}
-			if json.Unmarshal(data, &manifest) != nil || manifest.Version != "0.8.7" {
-				t.Errorf("%s/%s must ship the reviewed hook upgrade as 0.8.7", entry, runtime)
+			if json.Unmarshal(data, &manifest) != nil || manifest.Version != "0.8.8" {
+				t.Errorf("%s/%s must ship as the current release, 0.8.8", entry, runtime)
 			}
 		}
 	}
