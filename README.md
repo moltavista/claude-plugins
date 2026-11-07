@@ -30,7 +30,15 @@ For fabbrica, install **one** entry. Existing `mstep@moltavista` installs keep w
 
 See [the fab plugin guide](plugins/fab) for identities, hook privacy, approvals, Codex and troubleshooting. The [compatibility guide](plugins/mstep) covers existing installs.
 
-Maintainers: run `python3 -m unittest discover -s tests`, `claude plugin validate .`, and validate both plugin directories with a scratch home. Test marketplace installation and MCP listing with a scratch `CODEX_HOME`. Never update a person's live harness during validation. Keep both entries' bridge, hooks, monitors and skills identical and bump their Claude and Codex manifest versions together. The final mstep bundle PR updates its embedded Codex assets and direct configuration after this plugin transition ships.
+Maintainers: run `GO111MODULE=off go test ./tests` and the existing `python3 -m unittest discover -s tests`, `claude plugin validate .`, and validate both plugin directories with a scratch home. New tooling uses Go or shell. Test marketplace installation and MCP listing with a scratch `CODEX_HOME`. Never update a person's live harness during validation. Keep both entries' bridge, hooks, monitors and skills identical and bump their Claude and Codex manifest versions together. The Go release-contract test pins the current version; the legacy transition suite checks manifest parity. The final mstep bundle PR updates its embedded Codex assets and direct configuration after this plugin transition ships.
+
+## One-time secret delivery compatibility
+
+Version 0.8.7 adds a synchronous native prehook for direct `decision_secret_consume` calls, including a renamed MCP server. It requires the matching reviewed fab CLI release and its native-execution verification. Older CLIs or unproved bridge origins cannot deliver the answer. Codex additionally needs native request-thread metadata (verified in 0.162.1); wrappers without native proof are unsupported.
+
+Before forwarding a supported consume, the CLI durably pauses automatic content reporting for that native session. Tool results, automatic responses, live/terminal capture and remote approval summaries stay paused across session end/resume and CLI restart. Incoming steering and lifecycle metadata continue. The marker contains references, never the secret. The receiving model, provider and native transcript still receive the explicitly authorised value; this does not protect against that recipient retaining or disclosing it. Secret purposes remain off until separately activated.
+
+This PR does not install hooks in existing homes or trust changed definitions. Review the changed hooks in the host's normal trust UI after installing the matching released CLI and plugin.
 
 ## Maintainers: edit Forgejo, not the GitHub mirror
 

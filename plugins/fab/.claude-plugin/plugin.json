@@ -1,10 +1,10 @@
 {
   "name": "fab",
   "displayName": "fabbrica",
-  "version": "0.8.6",
+  "version": "0.8.7",
   "description": "fabbrica issue tracker: MCP tools, live agent sessions, human decisions and steering, through the fab CLI or compatible mst.",
   "author": {
-    "name": "M\u00f8ltavista",
+    "name": "Møltavista",
     "url": "https://git.teixos.net/moltavista"
   },
   "homepage": "https://git.teixos.net/moltavista/claude-plugins",

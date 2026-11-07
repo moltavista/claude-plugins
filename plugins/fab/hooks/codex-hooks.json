@@ -30,6 +30,16 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "^mcp__.+__decision_secret_consume$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/scripts/fab-run\" hook pre-tool-use --agent codex --deliver",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "^mcp__.*mstep.*__session_end$",
         "hooks": [
           {

@@ -1,6 +1,6 @@
 {
   "name": "mstep",
-  "version": "0.8.6",
+  "version": "0.8.7",
   "description": "Compatibility entry for the fabbrica plugin: MCP tools, agent sessions, human decisions and steering. Install only fab or mstep.",
   "keywords": [
     "mstep",
@@ -14,7 +14,7 @@
   "interface": {
     "displayName": "fabbrica (mstep compatibility)",
     "shortDescription": "fabbrica issues, live sessions and human steering",
-    "developerName": "M\u00f8ltavista",
+    "developerName": "Møltavista",
     "category": "Productivity",
     "websiteURL": "https://fab.moltavista.com/docs/codex"
   }

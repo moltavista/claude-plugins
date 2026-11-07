@@ -33,6 +33,20 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "^mcp__.+__decision_secret_consume$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/fab-run",
+            "args": [
+              "hook",
+              "pre-tool-use"
+            ],
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "hooks": [
           {
             "type": "command",
