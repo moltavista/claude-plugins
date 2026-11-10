@@ -1,5 +1,5 @@
 {
-  "description": "Codex hooks of the mstep plugin: report this Codex session's work to the mstep issue it is bound to and deliver human messages into it (via the fab CLI (mst compatible); no-op without it).",
+  "description": "Codex hooks of the fabbrica plugin: report this Codex session's work to the fabbrica issue it is bound to and deliver human messages into it (via the fab CLI (mst compatible); no-op without it).",
   "hooks": {
     "SessionStart": [
       {
@@ -40,7 +40,7 @@
         ]
       },
       {
-        "matcher": "^mcp__.*mstep.*__session_end$",
+        "matcher": "^mcp__.*(mstep|fabbrica).*__session_end$",
         "hooks": [
           {
             "type": "command",

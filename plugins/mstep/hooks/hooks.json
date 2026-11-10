@@ -1,5 +1,5 @@
 {
-  "description": "Reports this Claude Code session's work to the mstep issue it is bound to (via the fab CLI (mst compatible); no-op without it).",
+  "description": "Reports this Claude Code session's work to the fabbrica issue it is bound to (via the fab CLI, or a compatible mst; no-op without it).",
   "hooks": {
     "SessionStart": [
       {
@@ -75,7 +75,7 @@
         ]
       },
       {
-        "matcher": "mcp__.*mstep.*__session_end",
+        "matcher": "mcp__.*(mstep|fabbrica).*__session_end",
         "hooks": [
           {
             "type": "command",

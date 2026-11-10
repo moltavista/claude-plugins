@@ -12,7 +12,7 @@ BINDINGS = ['FAB_PROFILE', 'FAB_SERVER', 'FAB_CONFIG_DIR', 'FAB_MANAGED_FOLDER',
 
 class ManagedCodexEnvironmentTests(unittest.TestCase):
     def test_bridge_receives_managed_bindings_without_ambient_credentials(self):
-        server = json.loads((ROOT / 'plugins/mstep/codex.mcp.json').read_text())['mcpServers']['mstep']
+        server = json.loads((ROOT / 'plugins/mstep/codex.mcp.json').read_text())['mcpServers']['fabbrica']
         with tempfile.TemporaryDirectory(prefix='managed-codex-env-') as temp:
             binary = Path(temp) / 'mst'
             binary.write_text('#!/bin/sh\nif [ "$2" = --help ]; then exit 0; fi\n' +

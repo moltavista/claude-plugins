@@ -1,7 +1,7 @@
 {
   "name": "mstep",
-  "version": "0.8.8",
-  "description": "Compatibility entry for the fabbrica plugin: MCP tools, agent sessions, human decisions and steering. Install only fab or mstep.",
+  "version": "0.9.0",
+  "description": "Deprecated: install fab@moltavista instead and remove this entry. Compatibility entry for the fabbrica plugin (MCP tools, agent sessions, human decisions and steering); install only fab or mstep.",
   "keywords": [
     "mstep",
     "issues",
@@ -12,7 +12,7 @@
   "mcpServers": "./codex.mcp.json",
   "hooks": "./hooks/codex-hooks.json",
   "interface": {
-    "displayName": "fabbrica (mstep compatibility)",
+    "displayName": "fabbrica (mstep compatibility, deprecated)",
     "shortDescription": "fabbrica issues, live sessions and human steering",
     "developerName": "Møltavista",
     "category": "Productivity",
