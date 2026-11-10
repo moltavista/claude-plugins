@@ -61,6 +61,14 @@ class TransitionTests(unittest.TestCase):
             # Other hooks are never probed or hinted.
             r = self.run_launcher(['/bin/sh', str(ROOT / 'plugins/fab/scripts/fab-run'), 'hook', 'post-tool-use'])
             self.assertNotIn(hint, r.stdout)
+            # Codex: stdout stays the CLI's own (Mario's L1 on PR B); the
+            # hint goes to stderr.
+            r = self.run_launcher(['/bin/sh', str(ROOT / 'plugins/fab/scripts/fab-run'), 'hook', 'session-start',
+                                   '--agent', 'codex'])
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertNotIn(hint, r.stdout)
+            self.assertEqual(r.stdout, 'fab:hook session-start --agent codex\n')
+            self.assertEqual(r.stderr.count(hint), 1 if want else 0, r.stderr)
 
     def test_both_launchers_prefer_fab_and_preserve_legacy_profile(self):
         self.binary('fab', 'fab')

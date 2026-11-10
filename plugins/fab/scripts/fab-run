@@ -84,7 +84,13 @@ for m in "${FAB_BIN:-}" "$(command -v fab 2>/dev/null || true)" "$HOME/.local/bi
     # that release doesn't recognise those tool names in its hooks, so the
     # session isn't bound; say so once per session start (bounded probe).
     if [ "${1:-} ${2:-}" = "hook session-start" ] && ! probe_cli 2 "$m" hook --fabbrica-names --help; then
-      echo "The fabbrica plugin needs a newer fab CLI: this one doesn't recognise the plugin's fabbrica tool names, so this session's work isn't reported and human messages don't arrive (the MCP tools still work). The user can update it with: fab update"
+      hint="The fabbrica plugin needs a newer fab CLI: this one doesn't recognise the plugin's fabbrica tool names, so this session's work isn't reported and human messages don't arrive (the MCP tools still work). The user can update it with: fab update"
+      # Claude Code takes plain stdout as context; Codex's hook output stays
+      # the CLI's own, so the hint goes to stderr there.
+      case " $* " in
+        *" --agent codex "*) echo "fabbrica: $hint" >&2 ;;
+        *) echo "$hint" ;;
+      esac
     fi
     exec "$m" "$@"
   fi
