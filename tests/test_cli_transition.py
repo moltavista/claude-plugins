@@ -41,6 +41,27 @@ class TransitionTests(unittest.TestCase):
         return subprocess.run(cmd, env=env, input='', text=True,
                               capture_output=True, timeout=5)
 
+    def test_session_start_hints_an_update_for_a_cli_without_fabbrica_names(self):
+        # MV-1479 PR B: an older fab's hooks don't know the fabbrica tool
+        # names. The session start says so once, then runs the hook as
+        # before; a fab that knows them (PR A's probe flag) gets no hint.
+        hint = 'The fabbrica plugin needs a newer fab CLI'
+        for knows, want in [(False, True), (True, False)]:
+            p = self.bin / 'fab'
+            p.write_text('#!/bin/sh\n' +
+                         'case "$*" in *--fabbrica-names*) exit ' + ('0' if knows else '1') + ';; esac\n' +
+                         'printf "fab:%s\\n" "$*"\n')
+            p.chmod(0o700)
+            for script in ['plugins/fab/scripts/fab-run', 'plugins/mstep/scripts/fab-run']:
+                with self.subTest(knows=knows, script=script):
+                    r = self.run_launcher(['/bin/sh', str(ROOT / script), 'hook', 'session-start'])
+                    self.assertEqual(r.returncode, 0, r.stderr)
+                    self.assertEqual(r.stdout.count(hint), 1 if want else 0, r.stdout)
+                    self.assertTrue(r.stdout.rstrip().endswith('fab:hook session-start'), r.stdout)
+            # Other hooks are never probed or hinted.
+            r = self.run_launcher(['/bin/sh', str(ROOT / 'plugins/fab/scripts/fab-run'), 'hook', 'post-tool-use'])
+            self.assertNotIn(hint, r.stdout)
+
     def test_both_launchers_prefer_fab_and_preserve_legacy_profile(self):
         self.binary('fab', 'fab')
         self.binary('mst', 'mst')
@@ -148,7 +169,8 @@ class TransitionTests(unittest.TestCase):
             self.assertEqual(claude['name'], name)
             self.assertEqual(codex['name'], name)
             self.assertEqual(claude['version'], codex['version'])
-            self.assertEqual(set(json.loads((path / 'codex.mcp.json').read_text())['mcpServers']), {'mstep'})
+            self.assertEqual(set(json.loads((path / 'codex.mcp.json').read_text())['mcpServers']), {'fabbrica'})
+            self.assertEqual(set(json.loads((path / '.mcp.json').read_text())['mcpServers']), {'fabbrica'})
             for relative in ['.mcp.json', 'hooks/hooks.json',
                              'hooks/codex-hooks.json', 'monitors/monitors.json', 'scripts/fab-run']:
                 self.assertEqual((path / relative).read_bytes(),
@@ -162,7 +184,7 @@ class TransitionTests(unittest.TestCase):
                          if '--remind' in hook.get('args', [])]
             self.assertEqual(len(reminders), 1)
             group, hook = reminders[0]
-            self.assertEqual(group['matcher'], 'mcp__.*mstep.*__session_end')
+            self.assertEqual(group['matcher'], 'mcp__.*(mstep|fabbrica).*__session_end')
             self.assertFalse(hook.get('async', False))
             self.assertTrue(hook['command'].endswith('/scripts/fab-run'))
             skill = (path / 'skills/work-on-issue/SKILL.md').read_text()
@@ -173,7 +195,7 @@ class TransitionTests(unittest.TestCase):
         self.binary('fab', 'fab')
         codex_home = str(self.home / 'codex space')
         for entry in ['fab', 'mstep']:
-            server = json.loads((ROOT / 'plugins' / entry / 'codex.mcp.json').read_text())['mcpServers']['mstep']
+            server = json.loads((ROOT / 'plugins' / entry / 'codex.mcp.json').read_text())['mcpServers']['fabbrica']
             r = self.run_launcher([server['command'], *server['args']], CODEX_HOME=codex_home)
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertIn('mcp --agent codex --state-dir ' + codex_home + '/plugins/data/' + entry + '-moltavista --codex-home ' + codex_home, r.stdout)
@@ -183,7 +205,7 @@ class TransitionTests(unittest.TestCase):
         binary = self.bin / 'fab'
         binary.write_text('#!/bin/sh\ncase "$*" in *--agent*) exit 2;; *--help*) exit 0;; esac\nprintf "tools-work\\n"\n')
         binary.chmod(0o700)
-        server = json.loads((ROOT / 'plugins/fab/codex.mcp.json').read_text())['mcpServers']['mstep']
+        server = json.loads((ROOT / 'plugins/fab/codex.mcp.json').read_text())['mcpServers']['fabbrica']
         r = self.run_launcher([server['command'], *server['args']], CODEX_HOME=str(self.home / 'codex'))
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertEqual(r.stdout, 'tools-work\n')
@@ -195,7 +217,7 @@ class TransitionTests(unittest.TestCase):
         binary = self.bin / 'fab'
         binary.write_text('#!/bin/sh\ncase "$*" in *--agent*) exit 2;; *--help*) sleep 3; exit 0;; esac\nprintf "tools-work\\n"\n')
         binary.chmod(0o700)
-        server = json.loads((ROOT / 'plugins/fab/codex.mcp.json').read_text())['mcpServers']['mstep']
+        server = json.loads((ROOT / 'plugins/fab/codex.mcp.json').read_text())['mcpServers']['fabbrica']
         r = self.run_launcher([server['command'], *server['args']], CODEX_HOME=str(self.home / 'codex'))
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertEqual(r.stdout, 'tools-work\n')

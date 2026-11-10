@@ -1,11 +1,11 @@
 ---
 name: ask-human
-description: Use when mstep work is blocked on a choice only a human should make (product behaviour, scope, naming, risky or irreversible steps, missing access) - asks a structured mstep decision with a recommendation instead of guessing, and handles the answer.
+description: Use when fabbrica work is blocked on a choice only a human should make (product behaviour, scope, naming, risky or irreversible steps, missing access) - asks a structured fabbrica decision with a recommendation instead of guessing, and handles the answer.
 ---
 
-# Ask the humans (mstep decisions)
+# Ask the humans (fabbrica decisions)
 
-A **decision** is a structured question on the issue. The issue moves to "Needs Human", the recipients answer in mstep (web or phone), and the answer comes back to you.
+A **decision** is a structured question on the issue. The issue moves to "Needs Human", the recipients answer in fabbrica (web or phone), and the answer comes back to you.
 
 ## When
 
@@ -36,7 +36,7 @@ If the choice already needs a decision, a safe keep-current-setting fallback cou
 
 ## When the answer arrives
 
-- The same answer can reach you twice: as the tool result and as an `[mstep] decision on MST-12 answered by …` line (same decision id). Act on it once.
+- The same answer can reach you twice: as the tool result and as a `[fabbrica] decision on MST-12 answered by …` line (`[mstep]` from older servers) (same decision id). Act on it once.
 - An answer may say **"answered automatically at its deadline"** (`answered_automatically: true`, reason `deadline`). Follow the selected safe default once, preserving that provenance; do not describe it as a person's answer or treat it as human approval.
 - Follow the chosen option; read any free-text note, it can refine or override the options.
 - `canceled`: the question is moot. Re-read the issue and comments, re-plan, and only ask again if you are still blocked.

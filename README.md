@@ -26,7 +26,7 @@ Use the **moltaget** plugin to scrape, map, search and crawl the web through [mo
 
 See [the moltaget plugin guide](plugins/moltaget).
 
-For fabbrica, install **one** entry. Existing `mstep@moltavista` installs keep working as a compatibility alias for one transition cycle; do not enable it alongside `fab@moltavista`, which would duplicate hooks and watchers. The MCP server remains named `mstep`, and live events retain the `[mstep]` prefix during this cycle. Switching entries does not migrate credentials, edit running agents or restart their watchers.
+For fabbrica, install **one** entry. `mstep@moltavista` is **deprecated**: existing installs keep working for one transition cycle, but install `fab@moltavista` and remove the alias; do not enable both, which would duplicate hooks and watchers. From 0.9 the MCP server is named `fabbrica` and live events start with `[fabbrica]`; `[mstep]` lines from older servers are handled the same, under the same trust rules. 0.9 needs a fab CLI that reads the new names: update the CLI first (see [Upgrading to 0.9](plugins/fab#upgrading-to-09-the-fabbrica-names)). Switching entries does not migrate credentials, edit running agents or restart their watchers.
 
 See [the fab plugin guide](plugins/fab) for identities, hook privacy, approvals, Codex and troubleshooting. The [compatibility guide](plugins/mstep) covers existing installs.
 

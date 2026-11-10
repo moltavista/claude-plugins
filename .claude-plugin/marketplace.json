@@ -22,7 +22,7 @@
     {
       "name": "mstep",
       "source": "./plugins/mstep",
-      "description": "Compatibility alias for fabbrica, retained for one transition cycle. Install only fab or mstep.",
+      "description": "Deprecated compatibility alias for fabbrica: install fab instead and remove this entry. Install only fab or mstep.",
       "category": "productivity",
       "tags": [
         "issues",
